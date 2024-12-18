@@ -1,4 +1,9 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosRequestHeaders } from 'axios';
+import axios, {
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+  AxiosInstance,
+  AxiosRequestHeaders,
+} from 'axios';
 import { API_URL, API_CLIENT_HEADERS, WS_API_URL, WS_VERSION } from './request';
 import { SmartRentAuthClient } from './auth';
 import { SmartRentPlatform } from '../platform';

@@ -7,5 +7,7 @@ export * from './switch';
 export * from './thermostat';
 export * from './switchMultilevel';
 
-export interface AccessoryContext extends UnknownContext { device: DeviceDataUnion };
+export interface AccessoryContext extends UnknownContext {
+  device: DeviceDataUnion;
+}
 export type SmartRentAccessory = PlatformAccessory<Record<string, any>>;
