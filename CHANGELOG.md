@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.2...v1.2.3) (2024-12-18)
+
+### Bug Fixes
+
+* UI checkboxes ([9073816](https://github.com/jabrown93/homebridge-smartrent/commit/9073816d786ad547572d0b64dcb29f7eb52e583f))
+
 ## [1.2.2](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.1...v1.2.2) (2024-12-18)
 
 ### Bug Fixes
