@@ -11,10 +11,6 @@
     "smartrent"
   ],
   "license": "LGPL-3.0-or-later",
-  "publishConfig": {
-    "registry": "https://verdaccio.jaredbrown.io/",
-    "tag": "latest"
-  },
   "author": "Jared Brown",
   "repository": {
     "type": "git",
