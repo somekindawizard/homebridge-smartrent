@@ -28,6 +28,41 @@
         "maxLength": 6,
         "description": "If you have enabled two-factor authentication on your SmartRent account, enter the six-digit code here, then restart Homebridge before the code expires."
       },
+      "enableLeakSensors": {
+        "title": "Enable leak sensors",
+        "type": "boolean",
+        "required": false,
+        "default": true,
+        "description": "Uncheck to disable leak sensors."
+      },
+      "enableThermostats": {
+        "title": "Enable thermostats",
+        "type": "boolean",
+        "required": false,
+        "default": true,
+        "description": "Uncheck to disable thermostats."
+      },
+      "enableLocks": {
+        "title": "Enable locks",
+        "type": "boolean",
+        "required": false,
+        "default": true,
+        "description": "Uncheck to disable locks."
+      },
+      "enableSwitches": {
+        "title": "Enable switches",
+        "type": "boolean",
+        "required": false,
+        "default": true,
+        "description": "Uncheck to disable switches."
+      },
+      "enableSwitchMultiLevels": {
+        "title": "Enable switch multi-levels",
+        "type": "boolean",
+        "required": false,
+        "default": true,
+        "description": "Uncheck to disable switch multi-levels."
+      },
       "unitName": {
         "title": "Unit name",
         "type": "string",

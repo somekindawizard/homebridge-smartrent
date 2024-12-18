@@ -47,7 +47,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
   async login(payload) {
     try {
-      const { email, password, tfaCode } = payload;
+      const { email, password, tfaCode,  } = payload;
       if (!email) {
         console.error('Email required');
         return { code: 401, message: 'Email required' };

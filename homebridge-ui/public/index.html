@@ -44,6 +44,26 @@
         enter the six-digit code here.
       </small>
     </div>
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="enableLocksCheckbox" />
+      <label class="form-check-label" for="enableLocksCheckbox">Enable Locks</label>
+    </div>
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="enableThermostatsCheckbox" />
+      <label class="form-check-label" for="enableThermostatsCheckbox">Enable Thermostats</label>
+    </div>
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="enableLeakSensorsCheckbox" />
+      <label class="form-check-label" for="enableLeakSensorsCheckbox">Enable Leak Sensors</label>
+    </div>
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="enableSwitchesCheckbox" />
+      <label class="form-check-label" for="enableSwitchesCheckbox">Enable Switches</label>
+    </div>
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="enableSwitchMultiLevelsCheckbox" />
+      <label class="form-check-label" for="enableSwitchMultiLevelsCheckbox">Enable Switch Multi Levels</label>
+    </div>
     <div class="text-center">
       <button id="loginButton" type="submit" class="btn btn-primary" disabled>
         Login
@@ -71,16 +91,16 @@
         otherwise leave blank.
         <br />
         Get the name from the top of the More tab in the SmartRent app. (<a
-          href="https://apps.apple.com/us/app/smartrent/id1280670682"
-          target="_blank"
-          rel="noopener noreferrer"
-          >iOS</a
-        >,
+        href="https://apps.apple.com/us/app/smartrent/id1280670682"
+        target="_blank"
+        rel="noopener noreferrer"
+      >iOS</a
+      >,
         <a
           href="https://play.google.com/store/apps/details?id=com.smartrent.resident"
           target="_blank"
           rel="noopener noreferrer"
-          >Android</a
+        >Android</a
         >)
       </small>
     </div>
@@ -98,6 +118,11 @@
     const tfaCodeInput = document.getElementById('tfaCodeInput');
     const loginButton = document.getElementById('loginButton');
     const logoutButton = document.getElementById('logoutButton');
+    const enableLocksCheckbox = document.getElementById('enableLocksCheckbox');
+    const enableThermostatsCheckbox = document.getElementById('enableThermostatsCheckbox');
+    const enableLeakSensorsCheckbox = document.getElementById('enableLeakSensorsCheckbox');
+    const enableSwitchesCheckbox = document.getElementById('enableSwitchesCheckbox');
+    const enableSwitchMultiLevelsCheckbox = document.getElementById('enableSwitchMultiLevelsCheckbox');
 
     const updateLoginFormDisabled = () => {
       if (emailInput.value && passwordInput.value) {
@@ -107,10 +132,16 @@
       }
     };
 
-    const updateLoginForm = (email = '', password = '', tfaCode = '') => {
+    const updateLoginForm = (email = '', password = '', tfaCode = '', enableLocks = true, enableThermostats = true, enableLeakSensors = true, enableSwitches = true, enableSwitchMultiLevels = true) => {
       emailInput.setAttribute('value', email);
       passwordInput.setAttribute('value', password);
       tfaCodeInput.setAttribute('value', tfaCode);
+      enableLocksCheckbox.setAttribute('value', enableLocks);
+      enableThermostatsCheckbox.setAttribute('value', enableThermostats);
+      enableLeakSensorsCheckbox.setAttribute('value', enableLeakSensors);
+      enableSwitchesCheckbox.setAttribute('value', enableSwitches);
+      enableSwitchMultiLevelsCheckbox.setAttribute('value', enableSwitchMultiLevels);
+
       updateLoginFormDisabled();
     };
 
@@ -124,7 +155,13 @@
       unitNameInput.setAttribute('value', pluginConfig[0].unitName || '');
       updateLoginForm(
         pluginConfig[0].email || '',
-        pluginConfig[0].password || ''
+        pluginConfig[0].password || '',
+        pluginConfig[0].tfaCode || '',
+        pluginConfig[0].enableLocks || true,
+        pluginConfig[0].enableThermostats || true,
+        pluginConfig[0].enableLeakSensors || true,
+        pluginConfig[0].enableSwitches || true,
+        pluginConfig[0].enableSwitchMultiLevels || true
       );
     }
 
@@ -162,6 +199,11 @@
       if (tfaCodeInput.value) {
         pluginConfig[0].tfaCode = tfaCodeInput.value;
       }
+      pluginConfig[0].enableLocks = enableLocksCheckbox.value;
+      pluginConfig[0].enableThermostats = enableThermostatsCheckbox.value;
+      pluginConfig[0].enableLeakSensors = enableLeakSensorsCheckbox.value;
+      pluginConfig[0].enableSwitches = enableSwitchesCheckbox.value;
+      pluginConfig[0].enableSwitchMultiLevels = enableSwitchMultiLevelsCheckbox.value;
       await homebridge.updatePluginConfig(pluginConfig);
     });
 
