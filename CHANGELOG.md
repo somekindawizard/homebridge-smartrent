@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/jabrown93/homebridge-smartrent/compare/v1.1.4...v1.2.0) (2024-12-18)
+
+### Features
+
+* config ui updates ([38f9c09](https://github.com/jabrown93/homebridge-smartrent/commit/38f9c097afe4cce55aa493db4e28e2d918cbae67))
+* enable/disable accessory types ([98bcb3c](https://github.com/jabrown93/homebridge-smartrent/commit/98bcb3c226cbdc5a125d9e1daf91dd7e42262eac))
+
 ## [1.1.4](https://github.com/jabrown93/homebridge-smartrent/compare/v1.1.3...v1.1.4) (2024-12-18)
 
 ### Bug Fixes
