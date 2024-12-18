@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.1...v1.2.2) (2024-12-18)
+
+### Bug Fixes
+
+* config ui ([8dae379](https://github.com/jabrown93/homebridge-smartrent/commit/8dae379d7ed780e0436fc614bbc2e91b0f9bdb7d))
+
 ## [1.2.1](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.0...v1.2.1) (2024-12-18)
 
 ### Bug Fixes
