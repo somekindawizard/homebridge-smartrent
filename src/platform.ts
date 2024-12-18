@@ -89,11 +89,11 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
       Accessory = LeakSensorAccessory;
     } else if (type === 'entry_control' && this.config.enableLocks) {
       Accessory = LockAccessory;
-    } else if (type === 'switch_binary') {
+    } else if (type === 'switch_binary' && this.config.enableSwitches) {
       Accessory = SwitchAccessory;
-    } else if (type === 'thermostat') {
+    } else if (type === 'thermostat' && this.config.enableThermostats) {
       Accessory = ThermostatAccessory;
-    } else if (type === 'switch_multilevel') {
+    } else if (type === 'switch_multilevel' && this.config.enableSwitchMultiLevels) {
       Accessory = SwitchMultilevelAccessory;
     } else {
       this.log.info(`Unknown or disabled device type: ${device.type}`);
