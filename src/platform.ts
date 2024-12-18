@@ -99,7 +99,7 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
     ) {
       Accessory = SwitchMultilevelAccessory;
     } else {
-      this.log.info(`Unknown or disabled device type: ${device.type}`);
+      this.log.info(`Disabled device type: ${device.type}`);
       return;
     }
 
