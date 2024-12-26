@@ -4,7 +4,13 @@ import { existsSync, promises as fsPromises } from 'fs';
 import { URLSearchParams } from 'url';
 import { resolve as pathResolve } from 'path';
 import { SmartRentPlatformConfig } from './config';
-import { BASE_URL, SESSION_PATH, TFA_PATH, WEBSOCKET_TOKEN_PATH, AUTH_CLIENT_HEADERS } from './request';
+import {
+  BASE_URL,
+  SESSION_PATH,
+  TFA_PATH,
+  WEBSOCKET_TOKEN_PATH,
+  AUTH_CLIENT_HEADERS,
+} from './request';
 import { totp } from 'speakeasy';
 import { jwtDecode } from 'jwt-decode';
 
@@ -51,7 +57,7 @@ export type Session = {
   userId: number;
   accessToken: string;
   expires: Date;
-  webSocketToken ?: string;
+  webSocketToken?: string;
 };
 
 /**
@@ -165,7 +171,7 @@ export class SmartRentAuthClient {
     const webSocketToken = await this._getWebsocketToken(this.session);
     this.session = {
       ...this.session,
-      webSocketToken
+      webSocketToken,
     };
     this.log.info(`${refreshed ? 'Refreshed' : 'Started'} SmartRent session`);
     const sessionStr = JSON.stringify(this.session, null, 2);
@@ -329,8 +335,7 @@ export class SmartRentAuthClient {
         },
       }
     );
-    return response.data.data.token
-
+    return response.data.data.token;
   }
 
   /**
