@@ -30,18 +30,18 @@
       <input type="password" class="form-control" id="passwordInput" required />
     </div>
     <div class="form-group">
-      <label for="tfaSecretInput">Two-factor authentication code</label>
+      <label for="tfaSecretInput">Two-factor authentication secret</label>
       <input
-        type="number"
-        minlength="6"
-        maxlength="6"
+        type="text"
+        minlength="32"
+        maxlength="32"
         class="form-control"
         id="tfaSecretInput"
         aria-describedby="tfaSecretHelpBlock"
       />
       <small id="tfaSecretHelpBlock" class="form-text text-muted">
         If you have enabled two-factor authentication on your SmartRent account,
-        enter the six-digit code here.
+        enter the seed secret here.
       </small>
     </div>
     <div class="text-center">
