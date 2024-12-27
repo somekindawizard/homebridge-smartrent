@@ -3,18 +3,6 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.3.1](https://github.com/jabrown93/homebridge-smartrent/compare/v1.3.0...v1.3.1) (2024-12-26)
-
-### Bug Fixes
-
-* support tfa secret in form ([95088a3](https://github.com/jabrown93/homebridge-smartrent/commit/95088a3f00f3790ad5f7a87ad183a2938fc0ab7a))
-
-## [1.3.0](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.7...v1.3.0) (2024-12-26)
-
-### Features
-
-* Use v3 smartrent api ([b63c407](https://github.com/jabrown93/homebridge-smartrent/commit/b63c4070f6924c2caa86787185902b61ce18996a))
-
 ## [1.2.7](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.6...v1.2.7) (2024-12-19)
 
 ### Bug Fixes
@@ -180,12 +168,6 @@ All notable changes to this project will be documented in this file. See
 * **ci:** run semantic release ([0aa769b](https://github.com/jabrown93/homebridge-smartrent/commit/0aa769bcf5b8aebd368903e3e8757ebf0b47f590))
 * **ci:** using original .releaserc.json ([ecb1afc](https://github.com/jabrown93/homebridge-smartrent/commit/ecb1afccd11dcffd139af592a220cd3a678d2123))
 
-## [1.3.0](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.0...v1.3.0) (2023-07-23)
-
-
-### Features
-
-* lint ([bd0c055](https://github.com/jabrown93/homebridge-smartrent/commit/bd0c05599b254dc54d3bc9345766fb0a6c348449))
 
 ## [1.0.3](https://github.com/jabrown93/homebridge-smartrent/compare/v1.0.2...v1.0.3) (2022-08-12)
 
