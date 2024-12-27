@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/jabrown93/homebridge-smartrent/compare/v1.3.1...v2.0.0) (2024-12-27)
+
+### ⚠ BREAKING CHANGES
+
+* Switch from OTP code to secret
+
+### Features
+
+* Support Modern APIs and generate OTP from secret ([4ea108a](https://github.com/jabrown93/homebridge-smartrent/commit/4ea108a76d17e03a10aca3d43b14b47eccbffab4))
+
+### Bug Fixes
+
+* release configs ([2c00577](https://github.com/jabrown93/homebridge-smartrent/commit/2c005775b7bce2675a914a57cb065598fa3918da))
+* remove unused dependency ([0e68d8f](https://github.com/jabrown93/homebridge-smartrent/commit/0e68d8f4429d0ad6bfc76cfed2b4ab4467e399c3))
+
 ## [1.2.7](https://github.com/jabrown93/homebridge-smartrent/compare/v1.2.6...v1.2.7) (2024-12-19)
 
 ### Bug Fixes
