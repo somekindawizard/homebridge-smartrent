@@ -67,11 +67,11 @@ Homebridge SmartRent currently supports these devices through a SmartRent hub:
 
 All configuration values are strings.
 
-| Property    | Description                                                                                                                         |
-| ----------- |-------------------------------------------------------------------------------------------------------------------------------------|
-| `email`     | SmartRent account email                                                                                                             |
-| `password`  | SmartRent account password                                                                                                          |
-| `tfaSecret` | If you have enabled two-factor authentication on your SmartRent account, enter the secret used to seed the 2FA token                |
+| Property    | Description                                                                                                                          |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `email`     | SmartRent account email                                                                                                              |
+| `password`  | SmartRent account password                                                                                                           |
+| `tfaSecret` | If you have enabled two-factor authentication on your SmartRent account, enter the secret used to seed the 2FA token                 |
 | `unitName`  | Only necessary if you have multiple units in your SmartRent account. Get the name from the top of the More tab in the SmartRent app. |
 
 ## 🛠 Development
