@@ -23,10 +23,10 @@
         "title": "Two-factor authentication code",
         "type": "string",
         "required": false,
-        "pattern": "^[0-9]{6}$",
+        "pattern": "^[A-Z0-9]{32}$",
         "minLength": 6,
         "maxLength": 6,
-        "description": "If you have enabled two-factor authentication on your SmartRent account, enter the six-digit code here, then restart Homebridge before the code expires."
+        "description": "If you have enabled two-factor authentication on your SmartRent account, enter the seed secret here."
       },
       "enableLeakSensors": {
         "title": "Enable leak sensors",
