@@ -126,7 +126,6 @@ export class SmartRentAuthClient {
 
   private _handleRequest(config: InternalAxiosRequestConfig) {
     this.log.debug('Request:', JSON.stringify(config, null, 2));
-    this.log.debug('Request:');
     return config;
   }
 
@@ -194,7 +193,7 @@ export class SmartRentAuthClient {
     this.session = {
       ...this.session,
       webSocketToken: data,
-      websocketExpires: SmartRentAuthClient._getExpireDate(exp - 5), // refresh 5 seconds before expiration
+      websocketExpires: SmartRentAuthClient._getExpireDate(exp),
     };
     const sessionStr = JSON.stringify(this.session, null, 2);
     await fsPromises.writeFile(this.sessionPath, sessionStr);
