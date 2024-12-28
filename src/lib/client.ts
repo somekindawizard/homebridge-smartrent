@@ -43,7 +43,7 @@ export class SmartRentApiClient {
       platform.api.user.storagePath(),
       platform.log
     );
-    this.log = console;
+    this.log = platform.log ?? console;
     this.apiClient = this._initializeApiClient();
   }
 
