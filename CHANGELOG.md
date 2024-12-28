@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.11](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.10...v2.0.11) (2024-12-28)
+
+### Bug Fixes
+
+* update calculation of token expiration time ([8c1b1c3](https://github.com/jabrown93/homebridge-smartrent/commit/8c1b1c3f80578f2ddafc5c32419264a7369c732b))
+
 ## [2.0.10](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.9...v2.0.10) (2024-12-28)
 
 ### Bug Fixes
