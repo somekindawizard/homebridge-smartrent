@@ -95,8 +95,8 @@ export class SmartRentAuthClient {
   ): sessionData is TfaSessionData =>
     !!sessionData && 'tfa_api_token' in sessionData;
 
-  private static _getExpireDate(milliseconds: number, offsetInSeconds = 60) {
-    return new Date(1000 * milliseconds - offsetInSeconds * 1000);
+  private static _getExpireDate(epochSeconds: number) {
+    return new Date(1000 * epochSeconds);
   }
 
   /**
@@ -178,7 +178,7 @@ export class SmartRentAuthClient {
       ...this.session,
       userId: uid,
       accessToken: data.access_token,
-      expires: SmartRentAuthClient._getExpireDate(exp),
+      expires: SmartRentAuthClient._getExpireDate(exp - 60), // refresh 60 seconds before expiration
     };
 
     this.log.info(`${refreshed ? 'Refreshed' : 'Started'} SmartRent session`);
@@ -194,7 +194,7 @@ export class SmartRentAuthClient {
     this.session = {
       ...this.session,
       webSocketToken: data,
-      websocketExpires: SmartRentAuthClient._getExpireDate(exp, 0),
+      websocketExpires: SmartRentAuthClient._getExpireDate(exp - 5), // refresh 5 seconds before expiration
     };
     const sessionStr = JSON.stringify(this.session, null, 2);
     await fsPromises.writeFile(this.sessionPath, sessionStr);
