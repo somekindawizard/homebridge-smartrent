@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.10](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.9...v2.0.10) (2024-12-28)
+
+### Bug Fixes
+
+* websocket token expirationg ([2b2b254](https://github.com/jabrown93/homebridge-smartrent/commit/2b2b254c1c3ce9f1730543ef5141fd0b051ec993))
+
 ## [2.0.9](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.8...v2.0.9) (2024-12-28)
 
 ### Bug Fixes
