@@ -9,7 +9,7 @@ export type DeviceAttribute = {
 
 export type DeviceData<
   T extends string, // Device type
-  B extends boolean // Battery powered
+  B extends boolean, // Battery powered
 > = BatteryData<B> & {
   attributes: Array<DeviceAttribute>;
   icon: string | null;
