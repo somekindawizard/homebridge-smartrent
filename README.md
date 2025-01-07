@@ -36,7 +36,7 @@ Homebridge SmartRent currently supports these devices through a SmartRent hub:
 
 ## Installation
 
-[Install Homebridge](https://github.com/homebridge/homebridge/wiki), add it to [Apple Home](https://github.com/homebridge/homebridge/blob/master/README.md#adding-homebridge-to-ios), then install and configure Homebridge SmartRent.
+[Install Homebridge](https://github.com/homebridge/homebridge/wiki), add it to [Apple Home](https://github.com/homebridge/homebridge/blob/main/README.md#adding-homebridge-to-ios), then install and configure Homebridge SmartRent.
 
 ### Recommended
 

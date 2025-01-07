@@ -13,10 +13,10 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: ['master']
+    branches: ['main']
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: ['master']
+    branches: ['main']
   schedule:
     - cron: '36 4 * * 3'
 
@@ -76,6 +76,6 @@ jobs:
       #     ./location_of_script_within_repo/buildscript.sh
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         with:
           category: '/language:${{matrix.language}}'
