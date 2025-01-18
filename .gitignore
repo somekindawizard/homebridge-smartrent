@@ -125,3 +125,6 @@ dist
 # JetBrains
 .idea
 *.iml
+
+# Potentially sensitive Homebridge files
+test/hbConfig

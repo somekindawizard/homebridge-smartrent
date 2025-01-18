@@ -42,11 +42,14 @@
     "clean": "rimraf ./dist",
     "compile": "tsc",
     "build": "npm-run-all clean compile",
-    "watch": "npm run build && npm link && nodemon",
+    "watch": "npm run dev-setup && npm run build && npm link && nodemon",
     "prepublishOnly": "npm-run-all prettier lint build",
     "semantic-release": "cross-env semantic-release --no-ci",
     "release": "npm-run-all build semantic-release",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "dev-setup": "npm run setup-config && npm run setup-log",
+    "setup-config": "if [ ! -f ./test/hbConfig/config.json ]; then cp ./test/hbConfig/config-template.json ./test/hbConfig/config.json; fi",
+    "setup-log": "touch $(pwd)/test/hbConfig/homebridge.log && sed -i '' \"s|<log_file>|$(pwd)/test/hbConfig/homebridge.log|g\" $(pwd)/test/hbConfig/config.json"
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.0.0",
@@ -73,6 +76,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.17.0",
     "homebridge": "^2.0.0-beta.23",
+    "homebridge-config-ui-x": "^5.0.0-beta.35",
     "lint-staged": "^15.3.0",
     "nodemon": "^3.0.1",
     "npm-run-all": "^4.1.5",
