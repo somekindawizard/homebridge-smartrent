@@ -111,7 +111,6 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
         'Restoring existing accessory from cache:',
         accessory.displayName
       );
-      // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
       accessory.context.device = device;
       this.api.updatePlatformAccessories([accessory]);
     } else {

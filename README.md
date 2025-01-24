@@ -21,7 +21,7 @@ Unofficial [Homebridge](https://homebridge.io) plugin for [SmartRent](https://sm
 
 </span>
 
-# Tweaking for my personal use case (problems with refresh token and older APIs), not meant for public use. Use at your own risk. Only tested with locks.
+**Tweaking for my personal use case (problems with refresh token and older APIs), not meant for public use. Use at your own risk. Only tested with locks.**
 
 ## 🔄 Supported Devices
 
@@ -136,7 +136,29 @@ npm run watch
 
 This will launch an instance of Homebridge in debug mode which will restart every time you make a change to the source code. It will load the config stored in the default location under `~/.homebridge`. You may need to stop other running instances of Homebridge while using this command to prevent conflicts. You can adjust the Homebridge startup command in the [`nodemon.json`](./nodemon.json) file.
 
-# ⚖️ Legal
+## Help! I'm Having Issues!
+
+If you are having issues with this plugin, please check the following:
+
+- [Homebridge Basic Troubleshooting](https://github.com/homebridge/homebridge/wiki/Basic-Troubleshooting)
+
+If you're still having issues, let us know by opening
+an [issue](https://github.com/jabrown93/homebridge-smartrent/issues/new/choose) on GitHub. Please fill out
+the template with as much information as possible to help us help you.
+
+## I Have an Idea for a New Feature!
+
+If you have a feature request, please checkout our [Contribution](./CONTRIBUTING.md) guide and open
+a [feature request issue](https://github.com/jabrown93/homebridge-smartrent/issues/new?template=feature-request.md)
+
+## I Want to Contribute!
+
+If you want to contribute to this project, please checkout our [Contribution](./CONTRIBUTING.md) guide. We welcome
+contributions of all kinds!
+
+## Code of Conduct
+
+Please checkout our [Code of Conduct](./CODE_OF_CONDUCT.md) for more information.
 
 ## License
 

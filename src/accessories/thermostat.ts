@@ -11,10 +11,10 @@ import { WSEvent } from '../lib/client';
 import { findStateByName } from '../lib/utils';
 
 export class ThermostatAccessory {
-  private thermostatService: Service;
-  private fanService: Service;
+  private readonly thermostatService: Service;
+  private readonly fanService: Service;
 
-  private state: {
+  private readonly state: {
     hubId: string;
     deviceId: string;
     heating_cooling_state: {
@@ -180,93 +180,115 @@ export class ThermostatAccessory {
     );
     switch (event.name) {
       case 'fan_mode':
-        const fanMode = this.toFanOnCharacteristic(
-          event.last_read_state as ThermostatFanMode
-        );
-        this.state.fan_on.current = fanMode;
-        this.fanService.updateCharacteristic(
-          this.platform.Characteristic.On,
-          fanMode
-        );
+        this.handleFanModeChange(event);
         break;
       case 'mode':
-        const mode = this.toTargetHeatingCoolingStateCharacteristic(
-          event.last_read_state as ThermostatMode
-        );
-        let actualMode = mode;
-        if (
-          mode === this.platform.Characteristic.TargetHeatingCoolingState.AUTO
-        ) {
-          // Determine if heating or cooling based on target and current temperature
-          if (
-            this.state.target_temperature.current <
-            this.state.current_temperature.current
-          ) {
-            actualMode =
-              this.platform.Characteristic.CurrentHeatingCoolingState.COOL;
-          } else if (
-            this.state.target_temperature.current >
-            this.state.current_temperature.current
-          ) {
-            actualMode =
-              this.platform.Characteristic.CurrentHeatingCoolingState.HEAT;
-          } else {
-            actualMode =
-              this.platform.Characteristic.CurrentHeatingCoolingState.OFF;
-          }
-        }
-        this.state.heating_cooling_state.current = actualMode;
-        this.state.heating_cooling_state.target = mode;
-        this.thermostatService.updateCharacteristic(
-          this.platform.Characteristic.CurrentHeatingCoolingState,
-          actualMode
-        );
-        this.thermostatService.updateCharacteristic(
-          this.platform.Characteristic.TargetHeatingCoolingState,
-          mode
-        );
+        this.handleModeChange(event);
         break;
       case 'cooling_setpoint':
-        const coolingSetpoint = this.toTemperatureCharacteristic(
-          Number(event.last_read_state)
-        );
-        this.state.cooling_threshold_temperature.current = coolingSetpoint;
-        this.state.cooling_threshold_temperature.target = coolingSetpoint;
-        this.thermostatService.updateCharacteristic(
-          this.platform.Characteristic.CoolingThresholdTemperature,
-          coolingSetpoint
-        );
+        this.handleCoolingSetpointChange(event);
         break;
       case 'heating_setpoint':
-        const heatingSetpoint = this.toTemperatureCharacteristic(
-          Number(event.last_read_state)
-        );
-        this.state.heating_threshold_temperature.current = heatingSetpoint;
-        this.state.heating_threshold_temperature.target = heatingSetpoint;
-        this.thermostatService.updateCharacteristic(
-          this.platform.Characteristic.HeatingThresholdTemperature,
-          heatingSetpoint
-        );
+        this.handleHeatingSetpointChange(event);
         break;
       case 'current_temp':
-        const temperature = this.toTemperatureCharacteristic(
-          Number(event.last_read_state)
-        );
-        this.state.current_temperature.current = temperature;
-        this.thermostatService.updateCharacteristic(
-          this.platform.Characteristic.CurrentTemperature,
-          temperature
-        );
+        this.handleTempChange(event);
         break;
       case 'current_humidity':
-        const humidity = Math.round(Number(event.last_read_state));
-        this.state.current_relative_humidity.current = humidity;
-        this.thermostatService.updateCharacteristic(
-          this.platform.Characteristic.CurrentRelativeHumidity,
-          humidity
-        );
+        this.handleHumidtyChange(event);
         break;
     }
+  }
+
+  private handleHumidtyChange(event: WSEvent) {
+    const humidity = Math.round(Number(event.last_read_state));
+    this.state.current_relative_humidity.current = humidity;
+    this.thermostatService.updateCharacteristic(
+      this.platform.Characteristic.CurrentRelativeHumidity,
+      humidity
+    );
+  }
+
+  private handleTempChange(event: WSEvent) {
+    const temperature = this.toTemperatureCharacteristic(
+      Number(event.last_read_state)
+    );
+    this.state.current_temperature.current = temperature;
+    this.thermostatService.updateCharacteristic(
+      this.platform.Characteristic.CurrentTemperature,
+      temperature
+    );
+  }
+
+  private handleHeatingSetpointChange(event: WSEvent) {
+    const heatingSetpoint = this.toTemperatureCharacteristic(
+      Number(event.last_read_state)
+    );
+    this.state.heating_threshold_temperature.current = heatingSetpoint;
+    this.state.heating_threshold_temperature.target = heatingSetpoint;
+    this.thermostatService.updateCharacteristic(
+      this.platform.Characteristic.HeatingThresholdTemperature,
+      heatingSetpoint
+    );
+  }
+
+  private handleCoolingSetpointChange(event: WSEvent) {
+    const coolingSetpoint = this.toTemperatureCharacteristic(
+      Number(event.last_read_state)
+    );
+    this.state.cooling_threshold_temperature.current = coolingSetpoint;
+    this.state.cooling_threshold_temperature.target = coolingSetpoint;
+    this.thermostatService.updateCharacteristic(
+      this.platform.Characteristic.CoolingThresholdTemperature,
+      coolingSetpoint
+    );
+  }
+
+  private handleModeChange(event: WSEvent) {
+    const mode = this.toTargetHeatingCoolingStateCharacteristic(
+      event.last_read_state as ThermostatMode
+    );
+    let actualMode = mode;
+    if (mode === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+      // Determine if heating or cooling based on target and current temperature
+      if (
+        this.state.target_temperature.current <
+        this.state.current_temperature.current
+      ) {
+        actualMode =
+          this.platform.Characteristic.CurrentHeatingCoolingState.COOL;
+      } else if (
+        this.state.target_temperature.current >
+        this.state.current_temperature.current
+      ) {
+        actualMode =
+          this.platform.Characteristic.CurrentHeatingCoolingState.HEAT;
+      } else {
+        actualMode =
+          this.platform.Characteristic.CurrentHeatingCoolingState.OFF;
+      }
+    }
+    this.state.heating_cooling_state.current = actualMode;
+    this.state.heating_cooling_state.target = mode;
+    this.thermostatService.updateCharacteristic(
+      this.platform.Characteristic.CurrentHeatingCoolingState,
+      actualMode
+    );
+    this.thermostatService.updateCharacteristic(
+      this.platform.Characteristic.TargetHeatingCoolingState,
+      mode
+    );
+  }
+
+  private handleFanModeChange(event: WSEvent) {
+    const fanMode = this.toFanOnCharacteristic(
+      event.last_read_state as ThermostatFanMode
+    );
+    this.state.fan_on.current = fanMode;
+    this.fanService.updateCharacteristic(
+      this.platform.Characteristic.On,
+      fanMode
+    );
   }
 
   private toCurrentHeatingCoolingStateCharacteristic(
@@ -363,17 +385,24 @@ export class ThermostatAccessory {
   }
 
   private fromTemperatureCharacteristic(temperature: number) {
-    // this.platform.log.debug("fromTemperatureCharacteristic" + temperature + "=>" + (temperature * 9) / 5 + 32);
+    this.platform.log.debug(
+      'fromTemperatureCharacteristic' +
+        temperature +
+        '=>' +
+        (temperature * 9) / 5 +
+        32
+    );
     return (temperature * 9) / 5 + 32;
   }
 
   private toTemperatureCharacteristic(temperature: number) {
-    // this.platform.log.debug("toTemperatureCharacteristic" + temperature + "=>" + ((temperature - 32) * 5) / 9);
+    this.platform.log.debug(
+      'toTemperatureCharacteristic' +
+        temperature +
+        '=>' +
+        ((temperature - 32) * 5) / 9
+    );
     return ((temperature - 32) * 5) / 9;
-  }
-
-  private fromFanOnCharacteristic(on: boolean): ThermostatFanMode {
-    return on ? 'on' : 'auto';
   }
 
   private toFanOnCharacteristic(thermostatFanMode: ThermostatFanMode) {
@@ -648,7 +677,7 @@ export class ThermostatAccessory {
     this.platform.log.debug('Triggered SET On:', value);
 
     this.state.fan_on.target = value;
-    const fan_mode = this.fromFanOnCharacteristic(value);
+    const fan_mode = value ? 'on' : 'auto';
     const newAttributes = [{ name: 'fan_mode', state: fan_mode }];
     const thermostatAttributes =
       await this.platform.smartRentApi.setState<ThermostatData>(

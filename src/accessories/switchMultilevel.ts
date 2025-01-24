@@ -11,9 +11,9 @@ import { findStateByName } from '../lib/utils';
  * Each accessory may expose multiple services of different service types.
  */
 export class SwitchMultilevelAccessory {
-  private service: Service;
+  private readonly service: Service;
 
-  private state: {
+  private readonly state: {
     hubId: string;
     deviceId: string;
     on: {
@@ -88,19 +88,16 @@ export class SwitchMultilevelAccessory {
       'Received websocket Switch Multilevel event:',
       event
     );
-    switch (event.name) {
-      case 'on':
-        // TODO FIX
-        this.state.on.current = 0;
-
-        this.service.updateCharacteristic(
-          this.platform.Characteristic.On,
-          this.state.on.current
-        );
-        break;
-      default:
-        break;
+    if (event.name !== 'on') {
+      return;
     }
+
+    this.state.on.current = 0;
+
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.On,
+      this.state.on.current
+    );
   }
 
   /**

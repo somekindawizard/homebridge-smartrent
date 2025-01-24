@@ -32,7 +32,7 @@ export type WSEvent = {
 export type WSPayload = [null, null, WSDeviceList, string, WSEvent];
 
 export class SmartRentApiClient {
-  private authClient: SmartRentAuthClient;
+  private readonly authClient: SmartRentAuthClient;
   private readonly apiClient: AxiosInstance;
   protected readonly log: Logger | Console;
 
@@ -142,7 +142,7 @@ export class SmartRentApiClient {
 export class SmartRentWebsocketClient extends SmartRentApiClient {
   public wsClient: Promise<WebSocket>;
   public event: object;
-  private devices: number[];
+  private readonly devices: number[];
 
   constructor(readonly platform: SmartRentPlatform) {
     super(platform);
@@ -238,7 +238,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
     }
     try {
       if ((await this.wsClient).readyState !== WebSocket.OPEN) {
-        throw 'WebSocket not ready';
+        throw new Error('WebSocket not ready');
       }
       (await this.wsClient).send(
         JSON.stringify(<WSPayload>[

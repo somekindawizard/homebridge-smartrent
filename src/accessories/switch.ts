@@ -11,9 +11,9 @@ import { findStateByName } from '../lib/utils';
  * Each accessory may expose multiple services of different service types.
  */
 export class SwitchAccessory {
-  private service: Service;
+  private readonly service: Service;
 
-  private state: {
+  private readonly state: {
     hubId: string;
     deviceId: string;
     on: {
@@ -67,28 +67,20 @@ export class SwitchAccessory {
     ) => this.handleDeviceStateChanged(event);
   }
 
-  private static _getOnCharacteristicValue(on: boolean) {
-    return on ? 1 : 0;
-  }
-
   /**
    * Handle device state changed events
    */
   async handleDeviceStateChanged(event: WSEvent) {
     this.platform.log.debug('Received websocket Switch event:', event);
-    switch (event.name) {
-      case 'on':
-        this.state.on.current = SwitchAccessory._getOnCharacteristicValue(
-          event.last_read_state === 'true'
-        );
-        this.service.updateCharacteristic(
-          this.platform.Characteristic.On,
-          this.state.on.current
-        );
-        break;
-      default:
-        break;
+    if (event.name !== 'on') {
+      return;
     }
+
+    this.state.on.current = event.last_read_state === 'true' ? 0 : 1;
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.On,
+      this.state.on.current
+    );
   }
 
   /**
@@ -102,7 +94,7 @@ export class SwitchAccessory {
         this.state.deviceId
       );
     const on = findStateByName(switchAttributes, 'on') as boolean;
-    const currentValue = SwitchAccessory._getOnCharacteristicValue(on);
+    const currentValue = on ? 1 : 0;
     this.state.on.current = currentValue;
     return currentValue;
   }
@@ -121,6 +113,6 @@ export class SwitchAccessory {
         newAttributes
       );
     const on = findStateByName(switchAttributes, 'on') as boolean;
-    this.state.on.current = SwitchAccessory._getOnCharacteristicValue(on);
+    this.state.on.current = on ? 1 : 0;
   }
 }

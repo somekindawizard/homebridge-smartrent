@@ -10,9 +10,9 @@ import { findStateByName } from '../lib/utils';
  * Each accessory may expose multiple services of different service types.
  */
 export class LeakSensorAccessory {
-  private service: Service;
+  private readonly service: Service;
 
-  private state: {
+  private readonly state: {
     hubId: string;
     deviceId: string;
     leak: {
@@ -63,12 +63,6 @@ export class LeakSensorAccessory {
     ) => this.handleDeviceStateChanged(event);
   }
 
-  private _getLeakDetectedCharacteristicValue(leak: boolean) {
-    return leak
-      ? this.platform.Characteristic.LeakDetected.LEAK_DETECTED
-      : this.platform.Characteristic.LeakDetected.LEAK_NOT_DETECTED;
-  }
-
   /**
    * Handle requests to get the current value of the "Leak Detected" characteristic
    */
@@ -79,7 +73,9 @@ export class LeakSensorAccessory {
       this.state.deviceId
     );
     const leak = findStateByName(leakAttributes, 'leak') as boolean;
-    const currentValue = this._getLeakDetectedCharacteristicValue(leak);
+    const currentValue = leak
+      ? this.platform.Characteristic.LeakDetected.LEAK_DETECTED
+      : this.platform.Characteristic.LeakDetected.LEAK_NOT_DETECTED;
     this.state.leak.current = currentValue;
     return currentValue;
   }
@@ -91,18 +87,17 @@ export class LeakSensorAccessory {
   handleDeviceStateChanged(event: WSEvent) {
     this.platform.log.debug('Received websocket leak event:', event);
 
-    let leak: number;
-    switch (event.name) {
-      case 'leak':
-        leak = this._getLeakDetectedCharacteristicValue(
-          event.last_read_state === 'true'
-        );
-        this.state.leak.current = leak;
-        this.service.updateCharacteristic(
-          this.platform.Characteristic.LeakDetected,
-          leak
-        );
-        break;
+    if (event.name !== 'leak') {
+      return;
     }
+    const leak =
+      event.last_read_state === 'true'
+        ? this.platform.Characteristic.LeakDetected.LEAK_DETECTED
+        : this.platform.Characteristic.LeakDetected.LEAK_NOT_DETECTED;
+    this.state.leak.current = leak;
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.LeakDetected,
+      leak
+    );
   }
 }

@@ -11,10 +11,10 @@ import { findStateByName } from '../lib/utils';
  * Each accessory may expose multiple services of different service types.
  */
 export class LockAccessory {
-  private service: Service;
-  private battery: Service;
+  private readonly service: Service;
+  private readonly battery: Service;
 
-  private state: {
+  private readonly state: {
     hubId: string;
     deviceId: string;
     locked: {
@@ -79,23 +79,17 @@ export class LockAccessory {
       this.handleLockEvent.bind(this);
   }
 
-  private _getLockStateCharacteristicValue(locked: boolean) {
-    return locked
-      ? this.platform.Characteristic.LockTargetState.SECURED
-      : this.platform.Characteristic.LockTargetState.UNSECURED;
-  }
-
   /**
    * Handle requests to get the current value of the "Battery Level" characteristic
    */
   async handleBatteryLevelGet(): Promise<CharacteristicValue> {
     this.platform.log.debug('Triggered GET BatteryLevel');
-    const lockData = (await this.platform.smartRentApi.getData<LockData>(
+    const lockData = await this.platform.smartRentApi.getData<LockData>(
       this.state.hubId,
       this.state.deviceId
-    )) as LockData;
+    );
     this.platform.log.debug('Lock Data', lockData);
-    return Math.round(Number(lockData.battery_level)) as number;
+    return Math.round(Number(lockData.battery_level));
   }
 
   /**
@@ -111,7 +105,9 @@ export class LockAccessory {
       this.state.deviceId
     );
     const locked = findStateByName(lockAttributes, 'locked') as boolean;
-    const currentValue = this._getLockStateCharacteristicValue(locked);
+    const currentValue = locked
+      ? this.platform.Characteristic.LockTargetState.SECURED
+      : this.platform.Characteristic.LockTargetState.UNSECURED;
     this.state.locked.current = currentValue;
     this.platform.log.debug(
       'Triggered GET LockCurrentState Done',
@@ -133,7 +129,9 @@ export class LockAccessory {
       this.state.deviceId
     );
     const locked = findStateByName(lockAttributes, 'locked') as boolean;
-    return this._getLockStateCharacteristicValue(locked);
+    return locked
+      ? this.platform.Characteristic.LockTargetState.SECURED
+      : this.platform.Characteristic.LockTargetState.UNSECURED;
   }
 
   /**
@@ -156,24 +154,22 @@ export class LockAccessory {
    */
   async handleLockEvent(event: WSEvent) {
     this.platform.log.debug('Recieved event on Lock: ', event);
-    let currentValue;
-    switch (event.name) {
-      case 'locked':
-        currentValue = this._getLockStateCharacteristicValue(
-          event.last_read_state === 'true'
-        );
-        this.service.updateCharacteristic(
-          this.platform.Characteristic.LockCurrentState,
-          currentValue
-        );
-        this.service.updateCharacteristic(
-          this.platform.Characteristic.LockTargetState,
-          currentValue
-        );
-        break;
-      case 'notifications':
-        break;
+    if (event.name !== 'locked') {
+      return;
     }
+
+    const currentValue =
+      event.last_read_state === 'true'
+        ? this.platform.Characteristic.LockTargetState.SECURED
+        : this.platform.Characteristic.LockTargetState.UNSECURED;
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.LockCurrentState,
+      currentValue
+    );
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.LockTargetState,
+      currentValue
+    );
   }
 
   /**
@@ -193,7 +189,9 @@ export class LockAccessory {
         );
       this.platform.log.debug('lockAttributes', lockAttributes);
       const locked = findStateByName(lockAttributes, 'locked') as boolean;
-      const currentValue = this._getLockStateCharacteristicValue(locked);
+      const currentValue = locked
+        ? this.platform.Characteristic.LockTargetState.SECURED
+        : this.platform.Characteristic.LockTargetState.UNSECURED;
       this.state.locked.current = currentValue;
       this.state.locked.target = currentValue;
       this.service

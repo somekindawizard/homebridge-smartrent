@@ -10,4 +10,5 @@ export * from './switchMultilevel';
 export interface AccessoryContext extends UnknownContext {
   device: DeviceDataUnion;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SmartRentAccessory = PlatformAccessory<Record<string, any>>;

@@ -6,22 +6,22 @@ labels: [enhancement, device request]
 assignees: jabrown93
 ---
 
-**Describe the device:**
+# Describe the device
 
 <!-- Please provide a device type, model number, URL, or any other information needed to identify this device. -->
 
-**Describe the capabilities of the device:**
+# Describe the capabilities of the device
 
 <!-- How should HomeKit be able to control this device? Ex. turn it on/off, change the input -->
 
-**Network logs:**
+# Network logs
 
 <!-- We need to understand the data sent and received by the SmartRent app to control this device. -->
 <!-- Please replace [ ] with [X] if you agree to help. -->
 
 [ ] I am willing to provide network logs to assist in adding support for this device.
 
-**Additional context:**
+# Additional context
 
 <!-- Add any other context or screenshots about the device request here. -->
 
