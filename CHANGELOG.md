@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.18...v2.1.0) (2025-02-04)
+
+### Features
+
+* support auto locking a lock after it's been unlocked ([#24](https://github.com/jabrown93/homebridge-smartrent/issues/24)) ([1f158e7](https://github.com/jabrown93/homebridge-smartrent/commit/1f158e70737de4376b4a44b9028cac6df17d7478))
+
 ## [2.0.18](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.17...v2.0.18) (2025-02-02)
 
 ### Bug Fixes
