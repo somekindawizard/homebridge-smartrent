@@ -143,13 +143,12 @@ export class SmartRentApiClient {
 }
 
 export class SmartRentWebsocketClient extends SmartRentApiClient {
-  public wsClient: Promise<WebSocket>;
+  public wsClient?: WebSocket;
   public event: object;
   private readonly devices: number[];
 
   constructor(readonly platform: SmartRentPlatform) {
     super(platform);
-    this.wsClient = this._initializeWsClient();
     this.event = {};
     this.devices = [];
   }
@@ -173,6 +172,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
           },
           get() {
             _subscriptions = new Set();
+            return _subscriptions;
           },
         });
 
@@ -185,7 +185,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
    * Initialize WebSocket client for SmartRent API
    * @returns WebSocket client
    */
-  private async _initializeWsClient() {
+  async init() {
     this.log.debug('WebSocket connection opening');
     const token = String(await this.getAccessToken());
     const wsClient = new WebSocket(
@@ -197,7 +197,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
     wsClient.onmessage = this._handleWsMessage.bind(this);
     wsClient.onerror = this._handleWsError.bind(this);
     wsClient.onclose = this._handleWsClose.bind(this);
-    return wsClient;
+    this.wsClient = wsClient;
   }
 
   private _handleWsOpen() {
@@ -217,9 +217,8 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
 
   private _handleWsError(error: WebSocket.ErrorEvent) {
     this.log.error(`WebSocket error: ${error.message}`);
-    this.wsClient
-      .then(client => client.close())
-      .then(() => this._initializeWsClient);
+    this.wsClient?.close();
+    this.init().then(() => this.log.debug('Reconnecting WebSocket'));
   }
 
   private _handleWsClose(event: WebSocket.CloseEvent) {
@@ -229,7 +228,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
       }, Event: ${event}`,
       event
     );
-    this.wsClient = this._initializeWsClient();
+    this.init().then(() => this.log.debug('Reconnecting WebSocket'));
   }
 
   /**
@@ -243,10 +242,10 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
       this._emitize(this.event, `${deviceId}`);
     }
     try {
-      if ((await this.wsClient).readyState !== WebSocket.OPEN) {
+      if (this.wsClient?.readyState !== WebSocket.OPEN) {
         throw new Error('WebSocket not ready');
       }
-      (await this.wsClient).send(
+      this.wsClient.send(
         JSON.stringify(<WSPayload>[
           null,
           null,

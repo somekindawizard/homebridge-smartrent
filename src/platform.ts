@@ -71,9 +71,12 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
       this.log.error(`Unknown device type: ${device.type}`);
       return;
     }
+    const attributeNames = device.attributes.map(attr => {
+      return attr.name;
+    });
     if (
       type === 'sensor_notification' &&
-      'leak' in device.attributes &&
+      attributeNames.includes('leak') &&
       this.config.enableLeakSensors
     ) {
       Accessory = LeakSensorAccessory;
@@ -119,7 +122,8 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
 
     // create the accessory handler for the newly create accessory
     // this is imported from `platformAccessory.ts`
-    new Accessory(this, accessory);
+    new Accessory(this, accessory); //NSONAR
+    this.accessories.push(accessory);
 
     if (!accessoryExists) {
       // link the accessory to the platform

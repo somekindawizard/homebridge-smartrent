@@ -71,9 +71,9 @@ export type Session = {
 export class SmartRentAuthClient {
   public isTfaSession = false;
   private session?: Session;
-  private storagePath = '~/.homebridge';
-  private pluginPath = '~/.homebridge/smartrent';
-  private sessionPath = '~/.homebridge/smartrent/session.json';
+  private readonly storagePath: string = '~/.homebridge';
+  private readonly pluginPath: string = '~/.homebridge/smartrent';
+  private readonly sessionPath: string = '~/.homebridge/smartrent/session.json';
   private readonly log: Logger | Console;
   private readonly client: AxiosInstance;
 
@@ -85,12 +85,12 @@ export class SmartRentAuthClient {
     this.client = this._initializeClient();
   }
 
-  private static _isOauthSession = (
+  private static readonly _isOauthSession = (
     sessionData?: object
   ): sessionData is OAuthSessionData =>
     !!sessionData && 'access_token' in sessionData;
 
-  private static _isTfaSession = (
+  private static readonly _isTfaSession = (
     sessionData?: object
   ): sessionData is TfaSessionData =>
     !!sessionData && 'tfa_api_token' in sessionData;
@@ -222,10 +222,10 @@ export class SmartRentAuthClient {
     }
 
     // Attempt to start a session using the given email and password
-    const sessionData = await this._startBasicSession({
+    const sessionData = (await this._startBasicSession({
       email: email,
       password,
-    });
+    })) as unknown as SessionData;
 
     // If authentication is complete, return the session
     if (SmartRentAuthClient._isOauthSession(sessionData)) {
@@ -262,15 +262,13 @@ export class SmartRentAuthClient {
    * @returns OAuth2 session data
    */
   private async _startBasicSession(credentials: LoginCredentials) {
-    try {
-      return this._requestSession(credentials, SESSION_PATH);
-    } catch (error) {
+    return this._requestSession(credentials, SESSION_PATH).catch(error => {
       this._handleResponseError(
         error,
         'Invalid email or password',
         'create session'
       );
-    }
+    });
   }
 
   /**

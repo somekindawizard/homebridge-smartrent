@@ -1,7 +1,7 @@
 import { CharacteristicValue, Service } from 'homebridge';
 import { SmartRentPlatform } from '../platform.js';
 import type { SmartRentAccessory } from './index.js';
-import { LockData } from '../devices/index.js';
+import { LockData } from '../devices';
 import { WSEvent } from '../lib/client.js';
 import { findStateByName } from '../lib/utils.js';
 
@@ -94,6 +94,8 @@ export class LockAccessory {
     return Math.round(Number(lockData.battery_level));
   }
 
+  private readonly LOCKED: string = 'locked';
+
   /**
    * Handle requests to get the current value of the "Lock Current State" characteristic
    */
@@ -106,7 +108,7 @@ export class LockAccessory {
       this.state.hubId,
       this.state.deviceId
     );
-    const locked = findStateByName(lockAttributes, 'locked') as boolean;
+    const locked = findStateByName(lockAttributes, this.LOCKED) as boolean;
     const currentValue = locked
       ? this.platform.api.hap.Characteristic.LockTargetState.SECURED
       : this.platform.api.hap.Characteristic.LockTargetState.UNSECURED;
@@ -130,7 +132,7 @@ export class LockAccessory {
       this.state.hubId,
       this.state.deviceId
     );
-    const locked = findStateByName(lockAttributes, 'locked') as boolean;
+    const locked = findStateByName(lockAttributes, this.LOCKED) as boolean;
     return locked
       ? this.platform.api.hap.Characteristic.LockTargetState.SECURED
       : this.platform.api.hap.Characteristic.LockTargetState.UNSECURED;
@@ -142,7 +144,7 @@ export class LockAccessory {
   async handleLockTargetStateSet(value: CharacteristicValue) {
     this.platform.log.debug('Triggered SET LockTargetState:', value);
     this.state.locked.target = value;
-    const attributes = [{ name: 'locked', state: !!value }];
+    const attributes = [{ name: this.LOCKED, state: !!value }];
     const lockAttributes = await this.platform.smartRentApi.setState<LockData>(
       this.state.hubId,
       this.state.deviceId,
@@ -178,6 +180,7 @@ export class LockAccessory {
         this.platform.config.autoLockDelayInMinutes * 60 * 1000
       );
     } else if (this.timer) {
+      this.platform.log.debug('Lock is locked, clearing timer');
       clearTimeout(this.timer);
       this.timerSet = false;
     }
@@ -188,7 +191,7 @@ export class LockAccessory {
    */
   async handleLockEvent(event: WSEvent) {
     this.platform.log.debug('Received event on Lock: ', event);
-    if (event.name !== 'locked') {
+    if (event.name !== this.LOCKED) {
       return;
     }
 
@@ -223,7 +226,7 @@ export class LockAccessory {
           this.state.deviceId
         );
       this.platform.log.debug('lockAttributes', lockAttributes);
-      const locked = findStateByName(lockAttributes, 'locked') as boolean;
+      const locked = findStateByName(lockAttributes, this.LOCKED) as boolean;
       const currentValue = locked
         ? this.platform.api.hap.Characteristic.LockTargetState.SECURED
         : this.platform.api.hap.Characteristic.LockTargetState.UNSECURED;

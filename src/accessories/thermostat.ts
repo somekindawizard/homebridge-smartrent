@@ -311,17 +311,15 @@ export class ThermostatAccessory {
     thermostatMode: ThermostatMode
   ) {
     switch (thermostatMode) {
-      case 'off':
-        return this.platform.api.hap.Characteristic.CurrentHeatingCoolingState
-          .OFF;
       case 'cool':
         return this.platform.api.hap.Characteristic.CurrentHeatingCoolingState
           .COOL;
       case 'heat':
         return this.platform.api.hap.Characteristic.CurrentHeatingCoolingState
           .HEAT;
+      case 'off':
       default:
-        return this.platform.api.hap.Characteristic.TargetHeatingCoolingState
+        return this.platform.api.hap.Characteristic.CurrentHeatingCoolingState
           .OFF;
     }
   }
@@ -330,9 +328,6 @@ export class ThermostatAccessory {
     thermostatMode: ThermostatMode
   ) {
     switch (thermostatMode) {
-      case 'off':
-        return this.platform.api.hap.Characteristic.TargetHeatingCoolingState
-          .OFF;
       case 'cool':
         return this.platform.api.hap.Characteristic.TargetHeatingCoolingState
           .COOL;
@@ -342,6 +337,7 @@ export class ThermostatAccessory {
       case 'auto':
         return this.platform.api.hap.Characteristic.TargetHeatingCoolingState
           .AUTO;
+      case 'off':
       default:
         return this.platform.api.hap.Characteristic.TargetHeatingCoolingState
           .OFF;
@@ -352,14 +348,13 @@ export class ThermostatAccessory {
     targetHeatingCoolingState
   ): ThermostatMode {
     switch (targetHeatingCoolingState) {
-      case this.platform.api.hap.Characteristic.TargetHeatingCoolingState.OFF:
-        return 'off';
       case this.platform.api.hap.Characteristic.TargetHeatingCoolingState.COOL:
         return 'cool';
       case this.platform.api.hap.Characteristic.TargetHeatingCoolingState.HEAT:
         return 'heat';
       case this.platform.api.hap.Characteristic.TargetHeatingCoolingState.AUTO:
         return 'auto';
+      case this.platform.api.hap.Characteristic.TargetHeatingCoolingState.OFF:
       default:
         return 'off';
     }
