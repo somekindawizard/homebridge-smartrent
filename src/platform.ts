@@ -122,7 +122,7 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
 
     // create the accessory handler for the newly create accessory
     // this is imported from `platformAccessory.ts`
-    new Accessory(this, accessory); //NSONAR
+    new Accessory(this, accessory); //NOSONAR
     this.accessories.push(accessory);
 
     if (!accessoryExists) {
