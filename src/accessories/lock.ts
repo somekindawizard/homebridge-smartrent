@@ -109,6 +109,7 @@ export class LockAccessory {
       this.state.deviceId
     );
     const locked = findStateByName(lockAttributes, this.LOCKED) as boolean;
+    this.platform.log.debug('Lock Attributes', JSON.stringify(lockAttributes));
     const currentValue = locked
       ? this.platform.api.hap.Characteristic.LockTargetState.SECURED
       : this.platform.api.hap.Characteristic.LockTargetState.UNSECURED;
