@@ -21,6 +21,9 @@ Unofficial [Homebridge](https://homebridge.io) plugin for [SmartRent](https://sm
 
 </span>
 
+
+## WARNING: This plugin is not actively maintained except for automated dependnecy updates. Issues/bugs are unlikely to be addressed. Use at your own risk
+
 **Tweaking for my personal use case (problems with refresh token and older APIs), not meant for public use. Use at your own risk. Only tested with locks.**
 
 ## 🔄 Supported Devices
