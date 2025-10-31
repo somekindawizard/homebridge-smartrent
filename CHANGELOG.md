@@ -9,6 +9,12 @@ All notable changes to this project will be documented in this file. See
 
 * handle corrupted session file and fetch fresh token ([f993a42](https://github.com/jabrown93/homebridge-smartrent/commit/f993a42e8ab388d7bd5ad28bf6494f06fed3b416))
 
+## [2.2.1](https://github.com/jabrown93/homebridge-smartrent/compare/v2.2.0...v2.2.1) (2025-10-31)
+
+### Bug Fixes
+
+* handle corrupted session file and fetch fresh token ([f993a42](https://github.com/jabrown93/homebridge-smartrent/commit/f993a42e8ab388d7bd5ad28bf6494f06fed3b416))
+
 ## [2.2.0](https://github.com/jabrown93/homebridge-smartrent/compare/v2.1.4...v2.2.0) (2025-09-22)
 
 ### Features
