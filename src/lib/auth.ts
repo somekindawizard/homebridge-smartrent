@@ -70,7 +70,7 @@ export type Session = {
  */
 export class SmartRentAuthClient {
   public isTfaSession = false;
-  private session?: Session;
+  private session?: Session | null;
   private readonly storagePath: string = '~/.homebridge';
   private readonly pluginPath: string = '~/.homebridge/smartrent';
   private readonly sessionPath: string = '~/.homebridge/smartrent/session.json';
@@ -155,8 +155,17 @@ export class SmartRentAuthClient {
    */
   private async _readStoredSession() {
     if (existsSync(this.sessionPath)) {
-      const sessionString = await fsPromises.readFile(this.sessionPath, 'utf8');
-      this.session = JSON.parse(sessionString) as Session;
+      try {
+        const sessionString = await fsPromises.readFile(
+          this.sessionPath,
+          'utf8'
+        );
+        this.session = JSON.parse(sessionString) as Session;
+      } catch (err) {
+        this.log.error('Error reading saved session', err);
+        await fsPromises.rm(this.sessionPath);
+        this.session = null;
+      }
     } else if (!existsSync(this.pluginPath)) {
       await fsPromises.mkdir(this.pluginPath);
     }
