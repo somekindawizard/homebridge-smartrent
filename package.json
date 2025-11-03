@@ -75,7 +75,7 @@
     "@typescript-eslint/parser": "8.46.2",
     "conventional-changelog-conventionalcommits": "9.1.0",
     "cross-env": "10.1.0",
-    "eslint": "9.38.0",
+    "eslint": "9.39.0",
     "homebridge": "1.11.1",
     "homebridge-config-ui-x": "5.8.0",
     "husky": "9.1.7",
