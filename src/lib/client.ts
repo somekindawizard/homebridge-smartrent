@@ -151,6 +151,9 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
   private readonly maxReconnectDelay: number = 60000; // 60 seconds max
   private readonly baseReconnectDelay: number = 1000; // 1 second base
   private isReconnecting: boolean = false;
+  private heartbeatInterval?: NodeJS.Timeout;
+  private readonly heartbeatIntervalMs: number = 30000; // 30 seconds
+  private heartbeatRef: number = 0;
 
   constructor(readonly platform: SmartRentPlatform) {
     super(platform);
@@ -223,6 +226,8 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
     this.reconnectAttempts = 0; // Reset backoff on successful connection
     // Resubscribe all known devices
     this.devices.forEach(device => this._sendSubscription(device));
+    // Start Phoenix heartbeat to keep connection alive
+    this._startHeartbeat();
   }
 
   private _handleWsMessage(message: WebSocket.MessageEvent) {
@@ -257,10 +262,49 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
   }
 
   private _handleWsClose(event: WebSocket.CloseEvent) {
+    this._stopHeartbeat();
     this.log.info(
       `WebSocket connection closed (code: ${event.code}, reason: ${event.reason || 'none'})`
     );
     this._scheduleReconnect();
+  }
+
+  /**
+   * Start sending Phoenix heartbeat messages to keep the connection alive.
+   * Without this, SmartRent's server closes the connection every ~45 seconds.
+   */
+  private _startHeartbeat() {
+    this._stopHeartbeat();
+    this.heartbeatInterval = setInterval(async () => {
+      try {
+        const client = await this.wsClient;
+        if (client.readyState === WebSocket.OPEN) {
+          this.heartbeatRef++;
+          client.send(
+            JSON.stringify([
+              null,
+              String(this.heartbeatRef),
+              'phoenix',
+              'heartbeat',
+              {},
+            ])
+          );
+          this.log.debug('Sent heartbeat', this.heartbeatRef);
+        }
+      } catch (err) {
+        this.log.debug('Heartbeat send failed:', String(err));
+      }
+    }, this.heartbeatIntervalMs);
+  }
+
+  /**
+   * Stop the heartbeat interval
+   */
+  private _stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = undefined;
+    }
   }
 
   /**
