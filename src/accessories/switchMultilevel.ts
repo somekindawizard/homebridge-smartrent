@@ -6,9 +6,7 @@ import { WSEvent } from '../lib/client.js';
 import { findStateByName } from '../lib/utils.js';
 
 /**
- * Switch Muiltilevel Accessory
- * An instance of this class is created for each accessory the platform registers
- * Each accessory may expose multiple services of different service types.
+ * Switch Multilevel Accessory
  */
 export class SwitchMultilevelAccessory {
   private readonly service: Service;
@@ -43,7 +41,6 @@ export class SwitchMultilevelAccessory {
       },
     };
 
-    // set accessory information
     this.accessory
       .getService(this.platform.api.hap.Service.AccessoryInformation)!
       .setCharacteristic(
@@ -51,19 +48,15 @@ export class SwitchMultilevelAccessory {
         this.accessory.context.device.id.toString()
       );
 
-    // get the Switch Multilevel service if it exists, otherwise create a new Switch Multilevel service
     this.service =
       this.accessory.getService(this.platform.api.hap.Service.Lightbulb) ||
       this.accessory.addService(this.platform.api.hap.Service.Lightbulb);
 
-    // set the service name, this is what is displayed as the default name on the Home app
     this.service.setCharacteristic(
       this.platform.api.hap.Characteristic.Name,
       accessory.context.device.name
     );
 
-    // create handlers for required characteristics
-    // see https://developers.homebridge.io/#/service/Lightbulb
     this.service
       .getCharacteristic(this.platform.api.hap.Characteristic.On)
       .onGet(this.handleOnGet.bind(this))
@@ -74,15 +67,12 @@ export class SwitchMultilevelAccessory {
       .onGet(this.handleBrightnessGet.bind(this))
       .onSet(this.handleBrightnessSet.bind(this));
 
-    // subscribe to device state changed events
-    this.platform.smartRentApi.websocket.event[this.state.deviceId] = (
-      event: WSEvent
-    ) => this.handleDeviceStateChanged(event);
+    this.platform.smartRentApi.websocket.onDeviceEvent(
+      this.state.deviceId,
+      (event: WSEvent) => this.handleDeviceStateChanged(event)
+    );
   }
 
-  /**
-   * Handle device state changed events
-   */
   async handleDeviceStateChanged(event: WSEvent) {
     this.platform.log.debug(
       'Received websocket Switch Multilevel event:',
@@ -100,80 +90,103 @@ export class SwitchMultilevelAccessory {
     );
   }
 
-  /**
-   * Handle requests to get the current value of the "On" characteristic
-   */
   async handleOnGet(): Promise<CharacteristicValue> {
     this.platform.log.debug('Triggered GET On');
-    const switchMultilevelAttributes =
-      await this.platform.smartRentApi.getState<SwitchMultilevelData>(
-        this.state.hubId,
-        this.state.deviceId
+    try {
+      const switchMultilevelAttributes =
+        await this.platform.smartRentApi.getState<SwitchMultilevelData>(
+          this.state.hubId,
+          this.state.deviceId
+        );
+      const levelAttribute = findStateByName(
+        switchMultilevelAttributes,
+        'level'
+      ) as number;
+      const level = Number(levelAttribute) > 0 ? 1 : 0;
+      this.state.on.current = level;
+      return level;
+    } catch (err) {
+      this.platform.log.error(
+        'Error getting multilevel switch state:',
+        String(err)
       );
-    const levelAttribute = findStateByName(
-      switchMultilevelAttributes,
-      'level'
-    ) as number;
-    const level = Number(levelAttribute) > 0 ? 1 : 0;
-    this.state.on.current = level;
-    return level;
+      throw new this.platform.api.hap.HapStatusError(
+        this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE
+      );
+    }
   }
 
-  /**
-   * Handle requests to set the "On" characteristic
-   */
   async handleOnSet(value: CharacteristicValue) {
     this.platform.log.debug('Triggered SET On:', value);
-    this.state.on.target = value === true ? 1 : 0;
-    const newAttributes = [{ name: 'level', state: value === true ? 100 : 0 }];
-    const switchMultilevelAttributes =
-      await this.platform.smartRentApi.setState<SwitchMultilevelData>(
-        this.state.hubId,
-        this.state.deviceId,
-        newAttributes
+    try {
+      this.state.on.target = value === true ? 1 : 0;
+      const newAttributes = [
+        { name: 'level', state: value === true ? 100 : 0 },
+      ];
+      const switchMultilevelAttributes =
+        await this.platform.smartRentApi.setState<SwitchMultilevelData>(
+          this.state.hubId,
+          this.state.deviceId,
+          newAttributes
+        );
+      const levelAttribute = findStateByName(
+        switchMultilevelAttributes,
+        'level'
+      ) as number;
+      this.state.on.current = Number(levelAttribute) > 0 ? 1 : 0;
+    } catch (err) {
+      this.platform.log.error(
+        'Error setting multilevel switch state:',
+        String(err)
       );
-    const levelAttribute = findStateByName(
-      switchMultilevelAttributes,
-      'level'
-    ) as number;
-
-    this.state.on.current = Number(levelAttribute) > 0 ? 1 : 0;
+      throw new this.platform.api.hap.HapStatusError(
+        this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE
+      );
+    }
   }
 
-  /**
-   * Handle requests to get the current value of the "Brightness" characteristic
-   */
   async handleBrightnessGet(): Promise<CharacteristicValue> {
     this.platform.log.debug('Triggered GET Brightness');
-    const switchMultilevelAttributes =
-      await this.platform.smartRentApi.getState(
-        this.state.hubId,
-        this.state.deviceId
+    try {
+      const switchMultilevelAttributes =
+        await this.platform.smartRentApi.getState(
+          this.state.hubId,
+          this.state.deviceId
+        );
+      const level = findStateByName(
+        switchMultilevelAttributes,
+        'level'
+      ) as number;
+      this.state.on.current = level;
+      return level;
+    } catch (err) {
+      this.platform.log.error('Error getting brightness:', String(err));
+      throw new this.platform.api.hap.HapStatusError(
+        this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE
       );
-    const level = findStateByName(
-      switchMultilevelAttributes,
-      'level'
-    ) as number;
-    this.state.on.current = level;
-    return level;
+    }
   }
 
-  /**
-   * Handle requests to set the "On" characteristic
-   */
   async handleBrightnessSet(value: CharacteristicValue) {
     this.platform.log.debug('Triggered SET Brightness:', value);
-    this.state.on.target = value;
-    const newAttributes = [{ name: 'level', state: Number(value) }];
-    const switchMultilevelAttributes =
-      await this.platform.smartRentApi.setState<SwitchMultilevelData>(
-        this.state.hubId,
-        this.state.deviceId,
-        newAttributes
+    try {
+      this.state.on.target = value;
+      const newAttributes = [{ name: 'level', state: Number(value) }];
+      const switchMultilevelAttributes =
+        await this.platform.smartRentApi.setState<SwitchMultilevelData>(
+          this.state.hubId,
+          this.state.deviceId,
+          newAttributes
+        );
+      this.state.on.current = findStateByName(
+        switchMultilevelAttributes,
+        'level'
+      ) as number;
+    } catch (err) {
+      this.platform.log.error('Error setting brightness:', String(err));
+      throw new this.platform.api.hap.HapStatusError(
+        this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE
       );
-    this.state.on.current = findStateByName(
-      switchMultilevelAttributes,
-      'level'
-    ) as number;
+    }
   }
 }
