@@ -28,9 +28,7 @@ export class LeakSensorAccessory extends BaseAccessory {
       .getCharacteristic(C.LeakDetected)
       .onGet(this.handleLeakDetectedGet.bind(this));
 
-    this.battery =
-      this.accessory.getService(this.platform.api.hap.Service.Battery) ||
-      this.accessory.addService(this.platform.api.hap.Service.Battery);
+    this.battery = this.addBatteryService();
     this.battery
       .getCharacteristic(C.BatteryLevel)
       .onGet(this.handleBatteryLevelGet.bind(this));
