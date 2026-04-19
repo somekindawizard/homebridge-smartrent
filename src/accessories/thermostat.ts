@@ -27,6 +27,16 @@ function cToF(c: number): number {
   return (c * 9) / 5 + 32;
 }
 
+/**
+ * Sensible bounds for indoor thermostat setpoints. 10–32C ≈ 50–90F.
+ * Most US apartment thermostats won't go outside this range, and HomeKit's
+ * default of 10–38C produces a slider with way too much travel.
+ */
+const SETPOINT_MIN_C = 10;
+const SETPOINT_MAX_C = 32;
+/** ~1°F. Smaller steps produce ugly fractional Fahrenheit displays. */
+const SETPOINT_STEP_C = 0.5;
+
 export class ThermostatAccessory extends BaseAccessory {
   private readonly thermostatService: Service;
   private readonly fanService: Service;
@@ -71,6 +81,11 @@ export class ThermostatAccessory extends BaseAccessory {
 
     this.thermostatService
       .getCharacteristic(C.TargetTemperature)
+      .setProps({
+        minValue: SETPOINT_MIN_C,
+        maxValue: SETPOINT_MAX_C,
+        minStep: SETPOINT_STEP_C,
+      })
       .onGet(this.handleTargetTemperatureGet.bind(this))
       .onSet(this.handleTargetTemperatureSet.bind(this));
 
@@ -85,11 +100,21 @@ export class ThermostatAccessory extends BaseAccessory {
 
     this.thermostatService
       .getCharacteristic(C.CoolingThresholdTemperature)
+      .setProps({
+        minValue: SETPOINT_MIN_C,
+        maxValue: SETPOINT_MAX_C,
+        minStep: SETPOINT_STEP_C,
+      })
       .onGet(this.handleCoolingThresholdTemperatureGet.bind(this))
       .onSet(this.handleCoolingThresholdTemperatureSet.bind(this));
 
     this.thermostatService
       .getCharacteristic(C.HeatingThresholdTemperature)
+      .setProps({
+        minValue: SETPOINT_MIN_C,
+        maxValue: SETPOINT_MAX_C,
+        minStep: SETPOINT_STEP_C,
+      })
       .onGet(this.handleHeatingThresholdTemperatureGet.bind(this))
       .onSet(this.handleHeatingThresholdTemperatureSet.bind(this));
 
