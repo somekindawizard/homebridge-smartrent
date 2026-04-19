@@ -22,9 +22,8 @@ export interface SmartRentPlatformConfig extends PlatformConfig {
 
   // Sensor behavior
   /**
-   * Some SmartRent contact sensors report `true` for "open" instead of
-   * "closed". Set this to `true` to invert the polarity for all contact
-   * sensors. Defaults to `false`.
+   * If your contact sensors report `true` for "open" and `false` for "closed"
+   * (the inverse of our convention), set this to true to flip the polarity.
    */
   contactInverted?: boolean;
 
@@ -43,6 +42,13 @@ export interface SmartRentPlatformConfig extends PlatformConfig {
   /** Display thermostat temperature in Celsius instead of Fahrenheit. */
   useCelsiusDisplay?: boolean;
 }
+
+const KNOWN_POLLING_OVERRIDE_KEYS = new Set([
+  'locks',
+  'thermostats',
+  'switches',
+  'sensors',
+]);
 
 /**
  * Validate config and log a clear error for each missing/invalid field.
@@ -95,6 +101,33 @@ export function validateConfig(
       'Config error: "pollingIntervalSeconds" must be a non-negative number.'
     );
     ok = false;
+  }
+  if (
+    config.pollingOverrides !== undefined &&
+    (typeof config.pollingOverrides !== 'object' ||
+      config.pollingOverrides === null ||
+      Array.isArray(config.pollingOverrides))
+  ) {
+    log.error('Config error: "pollingOverrides" must be an object.');
+    ok = false;
+  } else if (config.pollingOverrides) {
+    for (const [key, value] of Object.entries(config.pollingOverrides)) {
+      if (!KNOWN_POLLING_OVERRIDE_KEYS.has(key)) {
+        log.warn(
+          `Config warning: "pollingOverrides.${key}" is not a recognized device-type key. ` +
+            `Known keys: ${Array.from(KNOWN_POLLING_OVERRIDE_KEYS).join(', ')}.`
+        );
+      }
+      if (
+        value !== undefined &&
+        (typeof value !== 'number' || value < 0 || !Number.isFinite(value))
+      ) {
+        log.error(
+          `Config error: "pollingOverrides.${key}" must be a non-negative number.`
+        );
+        ok = false;
+      }
+    }
   }
   if (
     config.contactInverted !== undefined &&
