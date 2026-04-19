@@ -11,11 +11,48 @@ export function findStateByName(
 }
 
 /**
+ * Tokens SmartRent uses (across various device types) to mean "the
+ * affirmative state of this attribute". Locks: 'locked'. Contact: 'closed'.
+ * Motion/leak: 'detected'/'wet'.
+ */
+const TRUE_TOKENS = new Set([
+  'true',
+  'on',
+  '1',
+  'locked',
+  'closed',
+  'detected',
+  'wet',
+  'yes',
+  'active',
+]);
+
+/**
+ * Tokens SmartRent uses to mean the negated state.
+ */
+const FALSE_TOKENS = new Set([
+  'false',
+  'off',
+  '0',
+  'unlocked',
+  'open',
+  'clear',
+  'dry',
+  'no',
+  'inactive',
+  'idle',
+]);
+
+/**
  * Parse a SmartRent attribute value as a boolean.
  *
  * SmartRent normalizes everything to strings on the wire, so we can't trust
  * truthiness directly: `Boolean('false')` is `true`. This handles the common
- * encodings: 'true'/'false', 'on'/'off', '1'/'0', and native bool/number.
+ * encodings: 'true'/'false', 'on'/'off', '1'/'0', and several human-readable
+ * tokens like 'locked'/'unlocked', 'open'/'closed', 'detected'/'clear'.
+ *
+ * Unknown strings fall back to `false` (the conservative choice for safety
+ * and security related attributes).
  */
 export function attrToBoolean(
   value: string | number | boolean | null
@@ -30,7 +67,13 @@ export function attrToBoolean(
     return value !== 0;
   }
   const lower = value.toLowerCase().trim();
-  return lower === 'true' || lower === 'on' || lower === '1';
+  if (TRUE_TOKENS.has(lower)) {
+    return true;
+  }
+  if (FALSE_TOKENS.has(lower)) {
+    return false;
+  }
+  return false;
 }
 
 /**

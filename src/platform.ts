@@ -164,7 +164,7 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
   private _initAccessory(
     uuid: string,
     device: DeviceDataUnion,
-    accessory?: SmartRentAccessory
+    existing?: SmartRentAccessory
   ) {
     const Accessory = this.pickAccessoryClass(device);
     if (!Accessory) {
@@ -172,55 +172,57 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
       return;
     }
 
-    let accessoryExists = true;
-    if (accessory) {
+    let accessory: SmartRentAccessory;
+    if (existing) {
       this.log.info(
         'Restoring existing accessory from cache:',
-        accessory.displayName
+        existing.displayName
       );
-      accessory.context.device = device;
-      this.api.updatePlatformAccessories([accessory]);
+      existing.context.device = device;
+      this.api.updatePlatformAccessories([existing]);
+      accessory = existing;
+      // Already in `this.accessories` from configureAccessory; do NOT push again.
     } else {
-      accessoryExists = false;
       this.log.info('Adding new accessory:', device.name);
       accessory = new this.api.platformAccessory<AccessoryContext>(
         device.name,
         uuid
       );
       accessory.context.device = device;
-    }
-
-    new Accessory(this, accessory); //NOSONAR
-    this.accessories.push(accessory);
-
-    if (!accessoryExists) {
+      this.accessories.push(accessory);
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
         accessory,
       ]);
     }
+
+    new Accessory(this, accessory); //NOSONAR
   }
 
   async discoverDevices() {
     const devices = await this.smartRentApi.discoverDevices();
 
-    const uuids = devices.map(device => {
+    const uuids = new Set<string>();
+    for (const device of devices) {
       const uuid = this.api.hap.uuid.generate(device.id.toString());
+      uuids.add(uuid);
       const existing = this.accessories.find(a => a.UUID === uuid);
       this._initAccessory(uuid, device, existing);
-      return uuid;
-    });
+    }
 
-    // Remove platform accessories no longer present.
-    for (const existingAccessory of this.accessories) {
-      if (!uuids.includes(existingAccessory.UUID)) {
-        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
-          existingAccessory,
-        ]);
+    // Remove platform accessories no longer present, and prune the internal list.
+    const stale = this.accessories.filter(a => !uuids.has(a.UUID));
+    if (stale.length) {
+      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, stale);
+      for (const a of stale) {
         this.log.info(
           'Removing existing accessory from cache:',
-          existingAccessory.displayName
+          a.displayName
         );
       }
+      // Mutate the array in place to drop stale entries.
+      const survivors = this.accessories.filter(a => uuids.has(a.UUID));
+      this.accessories.length = 0;
+      this.accessories.push(...survivors);
     }
   }
 

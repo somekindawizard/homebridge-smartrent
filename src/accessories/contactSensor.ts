@@ -40,9 +40,7 @@ export class ContactSensorAccessory extends BaseAccessory {
       .getCharacteristic(C.ContactSensorState)
       .onGet(this.handleContactGet.bind(this));
 
-    this.battery =
-      this.accessory.getService(this.platform.api.hap.Service.Battery) ||
-      this.accessory.addService(this.platform.api.hap.Service.Battery);
+    this.battery = this.addBatteryService();
     this.battery
       .getCharacteristic(C.BatteryLevel)
       .onGet(this.handleBatteryLevelGet.bind(this));
@@ -53,10 +51,19 @@ export class ContactSensorAccessory extends BaseAccessory {
     this.startPolling();
   }
 
+  /**
+   * Apply the optional `contactInverted` config. Some SmartRent contact
+   * sensors report `true` for "open" and `false` for "closed" — the inverse
+   * of our internal convention.
+   */
+  private applyInversion(closed: boolean): boolean {
+    return this.platform.config.contactInverted ? !closed : closed;
+  }
+
   private toContactValue(closed: boolean): CharacteristicValue {
     const C = this.platform.api.hap.Characteristic;
     // HomeKit: CONTACT_DETECTED = closed (0), CONTACT_NOT_DETECTED = open (1)
-    return closed
+    return this.applyInversion(closed)
       ? C.ContactSensorState.CONTACT_DETECTED
       : C.ContactSensorState.CONTACT_NOT_DETECTED;
   }

@@ -2,6 +2,7 @@ import { CharacteristicValue, Logger, Service } from 'homebridge';
 import { SmartRentPlatform } from '../platform.js';
 import type { SmartRentAccessory } from './index.js';
 import { WSEvent } from '../lib/client.js';
+import { PLUGIN_VERSION } from '../settings.js';
 
 /**
  * Shared functionality for all SmartRent accessories.
@@ -36,20 +37,15 @@ export abstract class BaseAccessory {
     const intervalSec = overrideSec ?? defaultSec;
     this.pollIntervalMs = intervalSec > 0 ? intervalSec * 1000 : 0;
 
+    const C = this.platform.api.hap.Characteristic;
     this.accessory
       .getService(this.platform.api.hap.Service.AccessoryInformation)!
-      .setCharacteristic(
-        this.platform.api.hap.Characteristic.Manufacturer,
-        'SmartRent'
-      )
-      .setCharacteristic(
-        this.platform.api.hap.Characteristic.Model,
-        accessory.context.device.type
-      )
-      .setCharacteristic(
-        this.platform.api.hap.Characteristic.SerialNumber,
-        this.deviceId
-      );
+      .setCharacteristic(C.Manufacturer, 'SmartRent')
+      .setCharacteristic(C.Model, accessory.context.device.type)
+      .setCharacteristic(C.SerialNumber, this.deviceId)
+      // HAP requires FirmwareRevision; without it Homebridge logs a warning
+      // and some HomeKit clients reject the accessory.
+      .setCharacteristic(C.FirmwareRevision, PLUGIN_VERSION);
 
     // Subscribe to WS events. Subclass implements the actual handling.
     this.platform.smartRentApi.websocket.onDeviceEvent(this.deviceId, event => {
@@ -78,6 +74,24 @@ export abstract class BaseAccessory {
         this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE
       );
     }
+  }
+
+  /**
+   * Get-or-add a Battery service with the required ChargingState set to
+   * NOT_CHARGEABLE. HAP's Battery service requires BatteryLevel,
+   * StatusLowBattery, AND ChargingState; omitting ChargingState makes the
+   * service technically malformed.
+   */
+  protected addBatteryService(): Service {
+    const C = this.platform.api.hap.Characteristic;
+    const battery =
+      this.accessory.getService(this.platform.api.hap.Service.Battery) ||
+      this.accessory.addService(this.platform.api.hap.Service.Battery);
+    battery.setCharacteristic(
+      C.ChargingState,
+      C.ChargingState.NOT_CHARGEABLE
+    );
+    return battery;
   }
 
   /**

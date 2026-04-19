@@ -70,6 +70,14 @@ type UnitRecords = {
   total_records: 1;
 };
 
+export interface GetStateOptions {
+  /**
+   * If true, skip the per-device attribute cache and force a fresh REST call.
+   * Use for safety-critical state reads (e.g., lock current state).
+   */
+  skipCache?: boolean;
+}
+
 export class SmartRentApi {
   public readonly client: SmartRentApiClient;
   public readonly websocket: SmartRentWebsocketClient;
@@ -132,15 +140,21 @@ export class SmartRentApi {
 
   /**
    * Fetch device attributes, hitting the cache first when fresh.
+   *
+   * Pass `{ skipCache: true }` to bypass the cache for this call (e.g., for
+   * safety-critical reads like a lock's current state).
    */
   public async getState<Device extends BaseDeviceResponse>(
     hubId: string,
-    deviceId: string
+    deviceId: string,
+    options?: GetStateOptions
   ): Promise<DeviceAttribute[]> {
-    const cached = this.cache.get(hubId, deviceId);
-    if (cached) {
-      this.platform.log.debug(`Cache hit: ${hubId}:${deviceId}`);
-      return cached;
+    if (!options?.skipCache) {
+      const cached = this.cache.get(hubId, deviceId);
+      if (cached) {
+        this.platform.log.debug(`Cache hit: ${hubId}:${deviceId}`);
+        return cached;
+      }
     }
     const device = await this.client.get<Device>(
       `/hubs/${hubId}/devices/${deviceId}`

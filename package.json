@@ -36,8 +36,8 @@
   "scripts": {
     "prettier": "prettier --check .",
     "format": "prettier --write .",
-    "lint": "eslint src/**.ts",
-    "lint:fix": "eslint src/**.ts --fix",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "clean": "rimraf ./dist",
     "compile": "tsc",
     "build": "npm-run-all clean compile",
@@ -48,7 +48,7 @@
     "tsc": "tsc --noEmit",
     "dev-setup": "npm run setup-config && npm run setup-log",
     "setup-config": "if [ ! -f ./test/hbConfig/config.json ]; then cp ./test/hbConfig/config-template.json ./test/hbConfig/config.json; fi",
-    "setup-log": "touch $(pwd)/test/hbConfig/homebridge.log && sed -i '' \"s|<log_file>|$(pwd)/test/hbConfig/homebridge.log|g\" $(pwd)/test/hbConfig/config.json"
+    "setup-log": "touch $(pwd)/test/hbConfig/homebridge.log && sed -i.bak \"s|<log_file>|$(pwd)/test/hbConfig/homebridge.log|g\" $(pwd)/test/hbConfig/config.json && rm -f $(pwd)/test/hbConfig/config.json.bak"
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.0.0",
