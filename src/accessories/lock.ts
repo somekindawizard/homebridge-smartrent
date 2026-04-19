@@ -22,9 +22,7 @@ export class LockAccessory extends BaseAccessory {
     this.currentLockedState = C.LockCurrentState.UNSECURED;
     this.targetLockedState = C.LockTargetState.UNSECURED;
 
-    this.battery =
-      this.accessory.getService(this.platform.api.hap.Service.Battery) ||
-      this.accessory.addService(this.platform.api.hap.Service.Battery);
+    this.battery = this.addBatteryService();
     this.battery
       .getCharacteristic(C.BatteryLevel)
       .onGet(this.handleBatteryLevelGet.bind(this));
@@ -81,9 +79,11 @@ export class LockAccessory extends BaseAccessory {
 
   async handleLockCurrentStateGet(): Promise<CharacteristicValue> {
     return this.hapCall('GET LockCurrentState', async () => {
+      // Lock state is safety-critical: never serve a cached value.
       const attrs = await this.platform.smartRentApi.getState<LockData>(
         this.hubId,
-        this.deviceId
+        this.deviceId,
+        { skipCache: true }
       );
       const locked = findBoolean(attrs, ATTR.LOCKED);
       this.currentLockedState = this.toLockState(locked);
@@ -95,7 +95,8 @@ export class LockAccessory extends BaseAccessory {
     return this.hapCall('GET LockTargetState', async () => {
       const attrs = await this.platform.smartRentApi.getState<LockData>(
         this.hubId,
-        this.deviceId
+        this.deviceId,
+        { skipCache: true }
       );
       // BUG FIX: previous code cast as `boolean`, which made
       // `Boolean('false')` evaluate to `true` and reported a locked door
@@ -215,7 +216,8 @@ export class LockAccessory extends BaseAccessory {
   protected async pollState() {
     const attrs = await this.platform.smartRentApi.getState<LockData>(
       this.hubId,
-      this.deviceId
+      this.deviceId,
+      { skipCache: true }
     );
     const locked = findBoolean(attrs, ATTR.LOCKED);
     const C = this.platform.api.hap.Characteristic;
