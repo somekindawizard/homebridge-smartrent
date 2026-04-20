@@ -214,10 +214,7 @@ export class SmartRentPlatform implements DynamicPlatformPlugin {
     if (stale.length) {
       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, stale);
       for (const a of stale) {
-        this.log.info(
-          'Removing existing accessory from cache:',
-          a.displayName
-        );
+        this.log.info('Removing existing accessory from cache:', a.displayName);
       }
       // Mutate the array in place to drop stale entries.
       const survivors = this.accessories.filter(a => uuids.has(a.UUID));

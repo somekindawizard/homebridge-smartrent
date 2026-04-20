@@ -87,10 +87,7 @@ export abstract class BaseAccessory {
     const battery =
       this.accessory.getService(this.platform.api.hap.Service.Battery) ||
       this.accessory.addService(this.platform.api.hap.Service.Battery);
-    battery.setCharacteristic(
-      C.ChargingState,
-      C.ChargingState.NOT_CHARGEABLE
-    );
+    battery.setCharacteristic(C.ChargingState, C.ChargingState.NOT_CHARGEABLE);
     return battery;
   }
 

@@ -373,7 +373,9 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
         return;
       }
-      if (this.missedHeartbeats >= SmartRentWebsocketClient.MAX_MISSED_HEARTBEATS) {
+      if (
+        this.missedHeartbeats >= SmartRentWebsocketClient.MAX_MISSED_HEARTBEATS
+      ) {
         this.log.warn(
           `WebSocket missed ${this.missedHeartbeats} heartbeats; forcing reconnect`
         );
@@ -425,10 +427,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
       );
       this.log.debug(`Subscribed to device: ${deviceId}`);
     } catch (err) {
-      this.log.error(
-        `Failed to subscribe to device ${deviceId}:`,
-        String(err)
-      );
+      this.log.error(`Failed to subscribe to device ${deviceId}:`, String(err));
     }
   }
 
