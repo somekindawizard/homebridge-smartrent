@@ -136,3 +136,34 @@ sudo npm install -g @prismwizard/homebridge-smartrent@latest
 
 Then restart Homebridge. Your lock should show the correct firmware version
 (`4.2.0`) in the Home app under accessory details.
+
+---
+
+## Quick reference: full command sequence
+
+For when you just want to copy-paste (after merging PRs on GitHub):
+
+```sh
+# Pull
+cd ~/homebridge-smartrent
+git checkout main
+git pull origin main
+
+# Verify
+npm ci
+npm run lint
+npm run build
+npm test
+npm pack --dry-run
+
+# Version + publish
+npm version minor -m "chore(release): %s"
+git push origin main --follow-tags
+npm publish
+
+# Confirm
+npm info @prismwizard/homebridge-smartrent version
+
+# Update Homebridge
+sudo npm install -g @prismwizard/homebridge-smartrent@latest
+```
