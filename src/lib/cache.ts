@@ -28,7 +28,7 @@ export class StateCache {
     if (!entry) {
       return null;
     }
-    if (Date.now() > entry.expiresAt) {
+    if (Date.now() >= entry.expiresAt) {
       this.entries.delete(this.key(hubId, deviceId));
       return null;
     }
