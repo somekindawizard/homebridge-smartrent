@@ -115,17 +115,27 @@ export class SmartRentAuthClient {
   }
 
   /**
-   * Log the SmartRent API response
-   * @param response Axios response
-   * @returns SmartRent response data payload
+   * Log the SmartRent API response.
+   *
+   * All auth client requests involve credentials or tokens; we log only
+   * the status line, never the body.
    */
   private _handleResponse(response: AxiosResponse) {
-    this.log.debug('Response:', JSON.stringify(response.data, null, 2));
+    this.log.debug(
+      `Auth response: ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`
+    );
     return response;
   }
 
+  /**
+   * Log the SmartRent API request.
+   *
+   * Request bodies contain passwords/tokens; we log only the method and URL.
+   */
   private _handleRequest(config: InternalAxiosRequestConfig) {
-    this.log.debug('Request:', JSON.stringify(config, null, 2));
+    this.log.debug(
+      `Auth request: ${config.method?.toUpperCase()} ${config.url}`
+    );
     return config;
   }
 
@@ -300,38 +310,6 @@ export class SmartRentAuthClient {
       );
     }
   }
-
-  // /**
-  //  * Refresh a session
-  //  * @returns OAuth2 session data
-  //  */
-  // private async _refreshSession() {
-  //   const refreshToken = this.session?.refreshToken;
-  //   if (!refreshToken) {
-  //     this.log.error('No refresh token');
-  //     return;
-  //   }
-  //   try {
-  //     const response = await this.client.post<{ data: OAuthSessionData }>(
-  //       '/tokens',
-  //       undefined,
-  //       {
-  //         headers: {
-  //           ...AUTH_CLIENT_HEADERS,
-  //           'Authorization-X-Refresh': refreshToken,
-  //         },
-  //       }
-  //     );
-  //     const sessionData = response.data.data;
-  //     return this._storeSession(sessionData, true);
-  //   } catch (error) {
-  //     this._handleResponseError(
-  //       error,
-  //       'Refresh token expired',
-  //       'refresh session'
-  //     );
-  //   }
-  // }
 
   private _handleResponseError(
     error: unknown,

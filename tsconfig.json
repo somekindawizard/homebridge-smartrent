@@ -10,11 +10,12 @@
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
-  "include": [".eslintrc.json", "homebridge-ui", "src/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["**/*.spec.ts"]
 }
