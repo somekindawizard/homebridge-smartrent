@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1] (2026-04-19)
+
+No functional changes. Reconciles the published tarball with the GitHub source tree.
+
+### Internal
+
+* Apply prettier formatting to `src/accessories/base.ts`, `src/lib/client.ts`, and `src/platform.ts`.
+* Fix ESLint indent warning in `src/lib/client.ts`.
+
 ## [4.1.0] (2026-04-19)
 
 Post-4.0.0 hardening pass. All additive — existing configs continue to work.
