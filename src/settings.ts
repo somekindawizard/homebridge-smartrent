@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json
  */
@@ -10,9 +12,11 @@ export const PLUGIN_NAME = '@prismwizard/homebridge-smartrent';
 
 /**
  * Reported to HomeKit as the FirmwareRevision on every accessory.
- * Keep this in sync with `version` in package.json.
+ * Read from package.json at startup so it never drifts out of sync.
  *
  * HAP requires AccessoryInformation to expose FirmwareRevision; without it
  * Homebridge logs a warning and some HomeKit clients reject the accessory.
  */
-export const PLUGIN_VERSION = '4.0.0';
+const _require = createRequire(import.meta.url);
+const _pkg = _require('../package.json') as { version: string };
+export const PLUGIN_VERSION: string = _pkg.version;

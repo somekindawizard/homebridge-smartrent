@@ -290,13 +290,21 @@ export class SmartRentApiClient {
   }
 }
 
-export class SmartRentWebsocketClient extends SmartRentApiClient {
+/**
+ * WebSocket client for SmartRent's Phoenix channels.
+ *
+ * Uses composition (holds a reference to SmartRentApiClient) rather than
+ * inheritance, avoiding the duplicate auth client and Axios instance that
+ * the previous `extends SmartRentApiClient` approach created.
+ */
+export class SmartRentWebsocketClient {
   public readonly eventEmitter: EventEmitter;
+  private readonly log: Logger | Console;
   private ws: WebSocket | null = null;
   private wsReady: Promise<WebSocket>;
   private wsReadyResolve!: (ws: WebSocket) => void;
   private wsReadyReject!: (err: unknown) => void;
-  private readonly devices: number[] = [];
+  private readonly devices = new Set<number>();
   private reconnectAttempts = 0;
   private readonly maxReconnectDelay = 60000;
   private readonly baseReconnectDelay = 1000;
@@ -311,8 +319,11 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
   private static readonly MAX_MISSED_HEARTBEATS = 3;
   private isShuttingDown = false;
 
-  constructor(readonly platform: SmartRentPlatform) {
-    super(platform);
+  constructor(
+    private readonly platform: SmartRentPlatform,
+    private readonly apiClient: SmartRentApiClient
+  ) {
+    this.log = platform.log ?? console;
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.setMaxListeners(0); // unlimited; we manage our own subscriptions
 
@@ -353,7 +364,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
     }
     this.log.debug('WebSocket connection opening');
     try {
-      const token = String(await this.getAccessToken());
+      const token = String(await this.apiClient.getAccessToken());
       const ws = new WebSocket(
         WS_API_URL +
           '?' +
@@ -535,9 +546,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
 
   public async subscribeDevice(deviceId: number) {
     this.log.debug(`Registering device: ${deviceId}`);
-    if (!this.devices.includes(deviceId)) {
-      this.devices.push(deviceId);
-    }
+    this.devices.add(deviceId);
     this._sendSubscription(deviceId);
   }
 
@@ -558,7 +567,7 @@ export class SmartRentWebsocketClient extends SmartRentApiClient {
     return {
       connected: this.ws?.readyState === WebSocket.OPEN,
       readyState: this.ws?.readyState ?? null,
-      subscribedDevices: this.devices.length,
+      subscribedDevices: this.devices.size,
       reconnectAttempts: this.reconnectAttempts,
       missedHeartbeats: this.missedHeartbeats,
     };

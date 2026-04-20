@@ -97,6 +97,13 @@
         "minimum": 1,
         "description": "How many minutes after unlock to auto-lock. Only applies when auto-lock is enabled."
       },
+      "contactInverted": {
+        "title": "Invert contact sensor polarity",
+        "type": "boolean",
+        "required": false,
+        "default": false,
+        "description": "Enable if your contact sensors report 'true' for open and 'false' for closed (the inverse of the default convention)."
+      },
       "useCelsiusDisplay": {
         "title": "Display thermostat in Celsius",
         "type": "boolean",

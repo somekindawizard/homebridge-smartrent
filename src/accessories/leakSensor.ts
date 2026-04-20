@@ -3,17 +3,16 @@ import { SmartRentPlatform } from '../platform.js';
 import type { SmartRentAccessory } from './index.js';
 import { LeakSensorData } from '../devices/index.js';
 import { WSEvent } from '../lib/client.js';
-import { findBoolean, attrToBoolean, attrToNumber } from '../lib/utils.js';
+import { findBoolean, attrToBoolean } from '../lib/utils.js';
 import { ATTR } from '../lib/attributes.js';
 import { BaseAccessory } from './base.js';
 
 export class LeakSensorAccessory extends BaseAccessory {
   private readonly service: Service;
-  private readonly battery: Service;
   private currentLeak: CharacteristicValue;
 
   constructor(platform: SmartRentPlatform, accessory: SmartRentAccessory) {
-    super(platform, accessory, 'sensors');
+    super(platform, accessory, 'sensors', { hasBattery: true });
 
     const C = this.platform.api.hap.Characteristic;
     this.currentLeak = C.LeakDetected.LEAK_NOT_DETECTED;
@@ -27,14 +26,6 @@ export class LeakSensorAccessory extends BaseAccessory {
     this.service
       .getCharacteristic(C.LeakDetected)
       .onGet(this.handleLeakDetectedGet.bind(this));
-
-    this.battery = this.addBatteryService();
-    this.battery
-      .getCharacteristic(C.BatteryLevel)
-      .onGet(this.handleBatteryLevelGet.bind(this));
-    this.battery
-      .getCharacteristic(C.StatusLowBattery)
-      .onGet(this.handleStatusLowBatteryGet.bind(this));
 
     this.startPolling();
   }
@@ -58,59 +49,28 @@ export class LeakSensorAccessory extends BaseAccessory {
     });
   }
 
-  async handleBatteryLevelGet(): Promise<CharacteristicValue> {
-    return this.hapCall('GET BatteryLevel', async () => {
-      const data = await this.platform.smartRentApi.getData<LeakSensorData>(
-        this.hubId,
-        this.deviceId
-      );
-      return Math.round(Number(data.battery_level ?? 100));
-    });
-  }
-
-  async handleStatusLowBatteryGet(): Promise<CharacteristicValue> {
-    return this.hapCall('GET StatusLowBattery', async () => {
-      const data = await this.platform.smartRentApi.getData<LeakSensorData>(
-        this.hubId,
-        this.deviceId
-      );
-      const level = Number(data.battery_level ?? 100);
-      const C = this.platform.api.hap.Characteristic;
-      return level < 20
-        ? C.StatusLowBattery.BATTERY_LEVEL_LOW
-        : C.StatusLowBattery.BATTERY_LEVEL_NORMAL;
-    });
-  }
-
   protected handleWsEvent(event: WSEvent) {
+    if (event.name !== ATTR.LEAK) {
+      return;
+    }
     const C = this.platform.api.hap.Characteristic;
-    if (event.name === ATTR.LEAK) {
-      const next = this.toLeakValue(attrToBoolean(event.last_read_state));
-      if (
-        this.updateIfChanged(
-          this.service,
-          C.LeakDetected,
-          next,
-          this.currentLeak
-        )
-      ) {
-        this.currentLeak = next;
-        this.log.info(
-          `[${this.accessory.displayName}] leak event: ${
-            next === C.LeakDetected.LEAK_DETECTED ? 'DETECTED' : 'cleared'
-          }`
-        );
-      }
-    } else if (event.name === ATTR.BATTERY_LEVEL) {
-      const level = Math.round(attrToNumber(event.last_read_state));
-      this.battery.updateCharacteristic(C.BatteryLevel, level);
-      this.battery.updateCharacteristic(
-        C.StatusLowBattery,
-        level < 20
-          ? C.StatusLowBattery.BATTERY_LEVEL_LOW
-          : C.StatusLowBattery.BATTERY_LEVEL_NORMAL
+    const next = this.toLeakValue(attrToBoolean(event.last_read_state));
+    if (
+      this.updateIfChanged(
+        this.service,
+        C.LeakDetected,
+        next,
+        this.currentLeak
+      )
+    ) {
+      this.currentLeak = next;
+      this.log.info(
+        `[${this.accessory.displayName}] leak event: ${
+          next === C.LeakDetected.LEAK_DETECTED ? 'DETECTED' : 'cleared'
+        }`
       );
     }
+    // battery_level events are handled by BaseAccessory
   }
 
   protected async pollState() {

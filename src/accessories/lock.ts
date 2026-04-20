@@ -3,32 +3,23 @@ import { SmartRentPlatform } from '../platform.js';
 import type { SmartRentAccessory } from './index.js';
 import { LockData } from '../devices/index.js';
 import { WSEvent } from '../lib/client.js';
-import { findBoolean, attrToBoolean, attrToNumber } from '../lib/utils.js';
+import { findBoolean, attrToBoolean } from '../lib/utils.js';
 import { ATTR } from '../lib/attributes.js';
 import { BaseAccessory } from './base.js';
 
 export class LockAccessory extends BaseAccessory {
   private readonly service: Service;
-  private readonly battery: Service;
   private autoLockTimer?: NodeJS.Timeout;
 
   private currentLockedState: CharacteristicValue;
   private targetLockedState: CharacteristicValue;
 
   constructor(platform: SmartRentPlatform, accessory: SmartRentAccessory) {
-    super(platform, accessory, 'locks');
+    super(platform, accessory, 'locks', { hasBattery: true });
 
     const C = this.platform.api.hap.Characteristic;
     this.currentLockedState = C.LockCurrentState.UNSECURED;
     this.targetLockedState = C.LockTargetState.UNSECURED;
-
-    this.battery = this.addBatteryService();
-    this.battery
-      .getCharacteristic(C.BatteryLevel)
-      .onGet(this.handleBatteryLevelGet.bind(this));
-    this.battery
-      .getCharacteristic(C.StatusLowBattery)
-      .onGet(this.handleStatusLowBatteryGet.bind(this));
 
     this.service =
       this.accessory.getService(this.platform.api.hap.Service.LockMechanism) ||
@@ -51,30 +42,6 @@ export class LockAccessory extends BaseAccessory {
   private toLockState(locked: boolean): CharacteristicValue {
     const C = this.platform.api.hap.Characteristic;
     return locked ? C.LockCurrentState.SECURED : C.LockCurrentState.UNSECURED;
-  }
-
-  async handleBatteryLevelGet(): Promise<CharacteristicValue> {
-    return this.hapCall('GET BatteryLevel', async () => {
-      const data = await this.platform.smartRentApi.getData<LockData>(
-        this.hubId,
-        this.deviceId
-      );
-      return Math.round(Number(data.battery_level ?? 0));
-    });
-  }
-
-  async handleStatusLowBatteryGet(): Promise<CharacteristicValue> {
-    return this.hapCall('GET StatusLowBattery', async () => {
-      const data = await this.platform.smartRentApi.getData<LockData>(
-        this.hubId,
-        this.deviceId
-      );
-      const level = Number(data.battery_level ?? 100);
-      const C = this.platform.api.hap.Characteristic;
-      return level < 20
-        ? C.StatusLowBattery.BATTERY_LEVEL_LOW
-        : C.StatusLowBattery.BATTERY_LEVEL_NORMAL;
-    });
   }
 
   async handleLockCurrentStateGet(): Promise<CharacteristicValue> {
@@ -200,17 +167,8 @@ export class LockAccessory extends BaseAccessory {
       this.currentLockedState = lockState;
       this.targetLockedState = targetState;
       this.scheduleAutoLock(targetState);
-    } else if (event.name === ATTR.BATTERY_LEVEL) {
-      const level = Math.round(attrToNumber(event.last_read_state));
-      const C = this.platform.api.hap.Characteristic;
-      this.battery.updateCharacteristic(C.BatteryLevel, level);
-      this.battery.updateCharacteristic(
-        C.StatusLowBattery,
-        level < 20
-          ? C.StatusLowBattery.BATTERY_LEVEL_LOW
-          : C.StatusLowBattery.BATTERY_LEVEL_NORMAL
-      );
     }
+    // battery_level events are handled by BaseAccessory
   }
 
   protected async pollState() {
