@@ -140,6 +140,19 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Type-safe helpers to get/set the retry flag on an Axios config object.
+ * Axios config is a complex type that doesn't have an index signature,
+ * so we cast through `unknown` to attach our custom property.
+ */
+function isRetry(config: InternalAxiosRequestConfig): boolean {
+  return !!(config as unknown as Record<string, unknown>)[RETRY_FLAG];
+}
+
+function markAsRetry(config: InternalAxiosRequestConfig): void {
+  (config as unknown as Record<string, unknown>)[RETRY_FLAG] = true;
+}
+
 export class SmartRentApiClient {
   private readonly authClient: SmartRentAuthClient;
   private readonly apiClient: AxiosInstance;
@@ -219,7 +232,7 @@ export class SmartRentApiClient {
 
     // If there's no config (request never sent) or this is already a retry,
     // don't retry again.
-    if (!config || (config as Record<string, unknown>)[RETRY_FLAG]) {
+    if (!config || isRetry(config)) {
       throw error;
     }
 
@@ -233,7 +246,7 @@ export class SmartRentApiClient {
         `SmartRent API rate limited (429). Waiting ${Math.round(delayMs / 1000)}s before retrying...`
       );
       await sleep(delayMs);
-      (config as Record<string, unknown>)[RETRY_FLAG] = true;
+      markAsRetry(config);
       return this.apiClient.request(config);
     }
 
@@ -243,7 +256,7 @@ export class SmartRentApiClient {
         `SmartRent API server error (${status}). Retrying in ${TRANSIENT_RETRY_DELAY_MS / 1000}s...`
       );
       await sleep(TRANSIENT_RETRY_DELAY_MS);
-      (config as Record<string, unknown>)[RETRY_FLAG] = true;
+      markAsRetry(config);
       return this.apiClient.request(config);
     }
 
