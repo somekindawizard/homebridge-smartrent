@@ -1,7 +1,7 @@
 {
   "displayName": "SmartRent",
   "name": "@prismwizard/homebridge-smartrent",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Homebridge plugin for SmartRent installations (fork with broadened Node.js support, bug fixes, and new device types)",
   "keywords": [
     "homebridge",
