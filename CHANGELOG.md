@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1] (2026-04-20)
+
+Quality-of-life and test coverage improvements. No runtime behavior changes.
+
+### Bug Fixes
+
+* **schema:** `contactInverted` was documented in the README and implemented in the contact sensor but missing from `config.schema.json`. Users configuring via the Homebridge UI never saw the option.
+
+### Internal
+
+* **package:** removed `src` from the npm `files` array. Published consumers only need `dist/`; shipping source roughly doubled package size for no runtime benefit.
+* **api:** added clarifying comment to the sequential `subscribeDevice` loop explaining that the `await` is intentional for deterministic ordering and forward-compatibility.
+
+### Tests
+
+* **config:** added `test/config.test.ts` (~160 lines, 20 test cases) covering required fields, optional field validation, `pollingOverrides` key validation, boundary conditions, `contactInverted`, and multi-error reporting.
+* **cache:** added `test/cache.test.ts` (~90 lines, 12 test cases) covering get/set round-trips, TTL expiry, TTL refresh, invalidation, clear, and zero-TTL edge case.
+* **attributes:** added `test/attributes.test.ts` (~45 lines, 8 test cases) validating all ATTR constant keys and values.
+
 ## [4.2.0] (2026-04-20)
 
 Architecture and reliability improvements. All backward compatible with no config changes required.
@@ -39,7 +58,7 @@ No functional changes. Reconciles the published tarball with the GitHub source t
 
 ## [4.1.0] (2026-04-19)
 
-Post-4.0.0 hardening pass. All additive — existing configs continue to work.
+Post-4.0.0 hardening pass. All additive -- existing configs continue to work.
 
 ### Features
 
@@ -48,7 +67,7 @@ Post-4.0.0 hardening pass. All additive — existing configs continue to work.
 * **api:** callers can now opt out of the state cache on a per-request basis.
 * **accessories:** report plugin version as `FirmwareRevision` in HomeKit and use a shared battery service helper that also sets `ChargingState`.
 * **contactSensor:** implement the previously-documented `contactInverted` config option for sensors that report the inverse of HomeKit's convention.
-* **thermostat:** constrain setpoint minimum step to 0.5°C (roughly 1°F) for more predictable HomeKit controls.
+* **thermostat:** constrain setpoint minimum step to 0.5C (roughly 1F) for more predictable HomeKit controls.
 * **utils:** `attrToBoolean` now recognizes additional SmartRent word encodings (lock/contact/sensor tokens) so attribute parsing is resilient to device-specific variations.
 * **config:** `contactInverted` toggle exposed in the Homebridge UI schema.
 
@@ -64,7 +83,7 @@ Post-4.0.0 hardening pass. All additive — existing configs continue to work.
 
 ## [4.0.0] (2026-04-17)
 
-Major rewrite focused on correctness, reliability, and broader device support. **Breaking changes:** the underlying accessory architecture changed and several long-standing bugs that produced wrong HomeKit state are now fixed — if you had automations relying on the buggy behavior they may need adjustment.
+Major rewrite focused on correctness, reliability, and broader device support. **Breaking changes:** the underlying accessory architecture changed and several long-standing bugs that produced wrong HomeKit state are now fixed -- if you had automations relying on the buggy behavior they may need adjustment.
 
 ### Bug Fixes
 
@@ -72,10 +91,10 @@ Major rewrite focused on correctness, reliability, and broader device support. *
 * **dimmer:** fix WebSocket handler that hardcoded `on = 0`, silently turning every dimmer off in HomeKit on every state change. Brightness changes from outside HomeKit also propagate now (the `level` event was being ignored entirely).
 * **thermostat:** fix `fromTargetTemperatureCharacteristic` switching on `currentHeatingCoolingState` (which never holds AUTO) instead of `targetHeatingCoolingState`. Target-temp writes in AUTO mode no longer get silently dropped.
 * **thermostat:** fix AUTO mode reading just the heating setpoint as the "single" target. Now returns the midpoint of the heat/cool setpoints, which is a more honest single-value representation.
-* **thermostat:** sensible default current-temp (20°C) instead of the HAP minimum -270°C, which would surface as -454°F before the first read.
+* **thermostat:** sensible default current-temp (20C) instead of the HAP minimum -270C, which would surface as -454F before the first read.
 * **thermostat:** fix the broken debug log that emitted `((t*9)/5)32` instead of the converted value.
 * **websocket:** fix `_initializeWsClient` returning a never-resolving promise on init failure, which permanently hung any caller awaiting `wsClient`.
-* **websocket:** add Phoenix channel heartbeats every 30 seconds — without them, idle connections were being silently closed by the server.
+* **websocket:** add Phoenix channel heartbeats every 30 seconds -- without them, idle connections were being silently closed by the server.
 * **api client:** stop logging full bearer tokens in debug output. The `Authorization` header is now redacted before logging.
 
 ### Features
@@ -96,23 +115,17 @@ Major rewrite focused on correctness, reliability, and broader device support. *
 
 ### Internal
 
-* Centralized SmartRent attribute name constants in `src/lib/attributes.ts` — no more magic strings scattered across files.
+* Centralized SmartRent attribute name constants in `src/lib/attributes.ts` -- no more magic strings scattered across files.
 * Typed `findBoolean`/`findNumber`/`findString` helpers replace casts that were silently producing wrong results.
 * Broadened WebSocket event name union to include `level`, `battery_level`, `contact`, `motion`, `tamper` (with a fallback `string` so future SmartRent attributes don't require a code change).
 * Increased Axios request timeout to 15 seconds.
-* `setMaxListeners(0)` on the device event emitter — no more arbitrary 50-device cap.
+* `setMaxListeners(0)` on the device event emitter -- no more arbitrary 50-device cap.
 
 ## [2.2.2](https://github.com/jabrown93/homebridge-smartrent/compare/v2.2.1...v2.2.2) (2026-02-14)
 
 ### Bug Fixes
 
 * **deps:** update vulnerable dependencies ([a84fffa](https://github.com/jabrown93/homebridge-smartrent/commit/a84fffa318f27c11e82aa9d77d1b3cd58192b280))
-
-## [2.2.1](https://github.com/jabrown93/homebridge-smartrent/compare/v2.2.0...v2.2.1) (2025-10-31)
-
-### Bug Fixes
-
-* handle corrupted session file and fetch fresh token ([f993a42](https://github.com/jabrown93/homebridge-smartrent/commit/f993a42e8ab388d7bd5ad28bf6494f06fed3b416))
 
 ## [2.2.1](https://github.com/jabrown93/homebridge-smartrent/compare/v2.2.0...v2.2.1) (2025-10-31)
 
@@ -179,12 +192,6 @@ Major rewrite focused on correctness, reliability, and broader device support. *
 ### Bug Fixes
 
 * mismatched license info ([bc4ebd7](https://github.com/jabrown93/homebridge-smartrent/commit/bc4ebd725a35c16415a2607652d772bfadae955b))
-
-## [2.0.14](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.13...v2.0.14) (2025-01-07)
-
-### Bug Fixes
-
-* update dependencies ([435ad89](https://github.com/jabrown93/homebridge-smartrent/commit/435ad89a9c524327301b99b8310f98382fa8088f))
 
 ## [2.0.14](https://github.com/jabrown93/homebridge-smartrent/compare/v2.0.13...v2.0.14) (2025-01-07)
 

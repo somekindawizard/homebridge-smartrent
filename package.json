@@ -26,7 +26,6 @@
   },
   "main": "dist/index.js",
   "files": [
-    "src",
     "dist",
     "config.example.json",
     "config.schema.json",

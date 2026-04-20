@@ -68,6 +68,9 @@ export class SmartRentApi {
       this.platform.log.error('No devices found');
     }
 
+    // Subscribe sequentially. _sendSubscription is currently synchronous
+    // (ws.send), but subscribeDevice is async to allow future changes.
+    // The await keeps ordering deterministic and avoids flooding the socket.
     for (const device of devices) {
       this.platform.log.debug('device:', device.id, device.name, device.type);
       await this.websocket.subscribeDevice(device.id);
