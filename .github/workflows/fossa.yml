@@ -1,12 +1,16 @@
 name: FOSSA Scan
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
 
 jobs:
   fossa-scan:
     runs-on: ubuntu-latest
+    # Only run if the FOSSA API key is available (skips forks and PRs)
+    if: ${{ secrets.FOSSA_API_KEY != '' }}
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v4
       - uses: fossas/fossa-action@v1.8.0
         with:
-          api-key: ${{secrets.FOSSA_API_KEY}}
+          api-key: ${{ secrets.FOSSA_API_KEY }}

@@ -1,9 +1,9 @@
 import { CharacteristicValue, Service } from 'homebridge';
 import { SmartRentPlatform } from '../platform.js';
 import type { SmartRentAccessory } from './index.js';
-import { LeakSensorData } from '../devices/index.js';
+import { ContactSensorData } from '../devices/index.js';
 import { WSEvent } from '../lib/client.js';
-import { findBoolean, attrToBoolean, attrToNumber } from '../lib/utils.js';
+import { findBoolean, attrToBoolean } from '../lib/utils.js';
 import { ATTR } from '../lib/attributes.js';
 import { BaseAccessory } from './base.js';
 
@@ -14,18 +14,17 @@ import { BaseAccessory } from './base.js';
  * as leak sensors, but with a `contact` attribute instead of `leak`.
  *
  * Convention used here:
- *   - `contact = true`  → contact CLOSED (door shut)
- *   - `contact = false` → contact OPEN
+ *   - `contact = true`  -> contact CLOSED (door shut)
+ *   - `contact = false` -> contact OPEN
  *
  * If your device reports the inverse, set `contactInverted: true` in config.
  */
 export class ContactSensorAccessory extends BaseAccessory {
   private readonly service: Service;
-  private readonly battery: Service;
   private currentContact: CharacteristicValue;
 
   constructor(platform: SmartRentPlatform, accessory: SmartRentAccessory) {
-    super(platform, accessory, 'sensors');
+    super(platform, accessory, 'sensors', { hasBattery: true });
 
     const C = this.platform.api.hap.Characteristic;
     this.currentContact = C.ContactSensorState.CONTACT_DETECTED;
@@ -40,20 +39,12 @@ export class ContactSensorAccessory extends BaseAccessory {
       .getCharacteristic(C.ContactSensorState)
       .onGet(this.handleContactGet.bind(this));
 
-    this.battery = this.addBatteryService();
-    this.battery
-      .getCharacteristic(C.BatteryLevel)
-      .onGet(this.handleBatteryLevelGet.bind(this));
-    this.battery
-      .getCharacteristic(C.StatusLowBattery)
-      .onGet(this.handleStatusLowBatteryGet.bind(this));
-
     this.startPolling();
   }
 
   /**
    * Apply the optional `contactInverted` config. Some SmartRent contact
-   * sensors report `true` for "open" and `false` for "closed" — the inverse
+   * sensors report `true` for "open" and `false` for "closed" -- the inverse
    * of our internal convention.
    */
   private applyInversion(closed: boolean): boolean {
@@ -70,68 +61,38 @@ export class ContactSensorAccessory extends BaseAccessory {
 
   async handleContactGet(): Promise<CharacteristicValue> {
     return this.hapCall('GET ContactSensorState', async () => {
-      const attrs = await this.platform.smartRentApi.getState<LeakSensorData>(
-        this.hubId,
-        this.deviceId
-      );
+      const attrs =
+        await this.platform.smartRentApi.getState<ContactSensorData>(
+          this.hubId,
+          this.deviceId
+        );
       const closed = findBoolean(attrs, ATTR.CONTACT);
       this.currentContact = this.toContactValue(closed);
       return this.currentContact;
     });
   }
 
-  async handleBatteryLevelGet(): Promise<CharacteristicValue> {
-    return this.hapCall('GET BatteryLevel', async () => {
-      const data = await this.platform.smartRentApi.getData<LeakSensorData>(
-        this.hubId,
-        this.deviceId
-      );
-      return Math.round(Number(data.battery_level ?? 100));
-    });
-  }
-
-  async handleStatusLowBatteryGet(): Promise<CharacteristicValue> {
-    return this.hapCall('GET StatusLowBattery', async () => {
-      const data = await this.platform.smartRentApi.getData<LeakSensorData>(
-        this.hubId,
-        this.deviceId
-      );
-      const level = Number(data.battery_level ?? 100);
-      const C = this.platform.api.hap.Characteristic;
-      return level < 20
-        ? C.StatusLowBattery.BATTERY_LEVEL_LOW
-        : C.StatusLowBattery.BATTERY_LEVEL_NORMAL;
-    });
-  }
-
   protected handleWsEvent(event: WSEvent) {
-    const C = this.platform.api.hap.Characteristic;
-    if (event.name === ATTR.CONTACT) {
-      const next = this.toContactValue(attrToBoolean(event.last_read_state));
-      if (
-        this.updateIfChanged(
-          this.service,
-          C.ContactSensorState,
-          next,
-          this.currentContact
-        )
-      ) {
-        this.currentContact = next;
-      }
-    } else if (event.name === ATTR.BATTERY_LEVEL) {
-      const level = Math.round(attrToNumber(event.last_read_state));
-      this.battery.updateCharacteristic(C.BatteryLevel, level);
-      this.battery.updateCharacteristic(
-        C.StatusLowBattery,
-        level < 20
-          ? C.StatusLowBattery.BATTERY_LEVEL_LOW
-          : C.StatusLowBattery.BATTERY_LEVEL_NORMAL
-      );
+    if (event.name !== ATTR.CONTACT) {
+      return;
     }
+    const C = this.platform.api.hap.Characteristic;
+    const next = this.toContactValue(attrToBoolean(event.last_read_state));
+    if (
+      this.updateIfChanged(
+        this.service,
+        C.ContactSensorState,
+        next,
+        this.currentContact
+      )
+    ) {
+      this.currentContact = next;
+    }
+    // battery_level events are handled by BaseAccessory
   }
 
   protected async pollState() {
-    const attrs = await this.platform.smartRentApi.getState<LeakSensorData>(
+    const attrs = await this.platform.smartRentApi.getState<ContactSensorData>(
       this.hubId,
       this.deviceId
     );

@@ -27,6 +27,9 @@ This fork has diverged significantly from the original. Highlights:
 - **Thermostat AUTO mode** reports the midpoint of heat/cool setpoints rather than the heat setpoint alone.
 - **WebSocket connection** survives idle periods (Phoenix heartbeats added) and recovers correctly from init failures (no more never-resolving promises).
 - **Bearer tokens** are no longer logged in debug output.
+- **Auth client** debug logs no longer leak passwords or tokens (request bodies and response payloads are fully redacted).
+- **Firmware version** reported to HomeKit now always matches the actual plugin version (previously was a stale hardcoded string).
+- **Polling overlap** is prevented: if a poll is still in-flight when the next interval fires, it is skipped instead of stacking parallel requests.
 
 ### New features
 
@@ -39,25 +42,32 @@ This fork has diverged significantly from the original. Highlights:
 - **Config validation** with clear startup errors instead of cryptic runtime failures.
 - **Graceful shutdown** with proper timer cleanup.
 
+### Architecture (4.2.0)
+
+- **Battery logic centralized**: battery service setup, characteristic handlers, and WebSocket event handling are in `BaseAccessory` via an opt-in `{ hasBattery: true }` flag, eliminating ~40 lines of duplicated boilerplate per sensor/lock accessory.
+- **WebSocket client uses composition**: no longer inherits from the REST API client, avoiding a duplicate auth client and Axios instance.
+- **Type safety tightened**: `SmartRentAccessory` uses a typed `AccessoryContext` instead of `Record<string, any>`. Dedicated `ContactSensorData` and `MotionSensorData` type aliases replace misleading `LeakSensorData` references. `noImplicitAny` is now enabled.
+- **Device types extracted**: `UnitData`/`UnitRecords` moved to their own module; device barrel exports updated.
+
 ### Other changes from the original fork point
 
 - **Broadened Node.js support**: Works with Node.js 20, 22, and 24+ (upstream required Node 24 only)
 - **Removed automated release pipeline**: Manual `npm publish` for simplicity
 - **Republished under `@prismwizard` scope**
 
-## 🔄 Supported Devices
+## Supported Devices
 
 Homebridge SmartRent currently supports these devices through a SmartRent hub:
 
-- 🔒 Locks
-- 💧 Leak sensors
-- 🚪 Contact sensors (doors/windows)
-- 👁️ Motion sensors
-- 🔌 Switches
-- 🌡 Thermostats
-- 🎚 Multilevel (Dimmer) Switches
+- Lock
+- Leak sensors
+- Contact sensors (doors/windows)
+- Motion sensors
+- Switches
+- Thermostats
+- Multilevel (Dimmer) Switches
 
-## ✅ Usage
+## Usage
 
 ### Installation
 
@@ -115,13 +125,19 @@ Homebridge SmartRent currently supports these devices through a SmartRent hub:
 | `enableAutoLock`         | boolean | `false` | Automatically re-lock after a delay following an unlock |
 | `autoLockDelayInMinutes` | integer | `5`     | Minutes to wait before auto-locking                     |
 
+### Sensor behavior
+
+| Property          | Type    | Default | Description                                                                                         |
+| ----------------- | ------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `contactInverted` | boolean | `false` | Flip contact sensor polarity if your sensors report `true` for open and `false` for closed          |
+
 ### Tuning
 
 | Property                 | Type    | Default | Description                                                                                           |
 | ------------------------ | ------- | ------- | ----------------------------------------------------------------------------------------------------- |
 | `cacheTtlSeconds`        | integer | `5`     | How long to cache device state to reduce API calls. WS events invalidate immediately. `0` to disable. |
 | `pollingIntervalSeconds` | integer | `30`    | Fallback polling interval when WS events are missed. `0` to disable.                                  |
-| `pollingOverrides`       | object  | —       | Per-type polling overrides: `{ locks, thermostats, switches, sensors }` (each in seconds).            |
+| `pollingOverrides`       | object  |         | Per-type polling overrides: `{ locks, thermostats, switches, sensors }` (each in seconds).            |
 | `useCelsiusDisplay`      | boolean | `false` | Display thermostat values in Celsius. Internal values remain SmartRent's native Fahrenheit.           |
 
 ### Run tests
@@ -130,7 +146,7 @@ Homebridge SmartRent currently supports these devices through a SmartRent hub:
 npm test
 ```
 
-## 🛠 Development
+## Development
 
 ### Setup Development Environment
 
