@@ -1,4 +1,4 @@
-# Merge, Build & Publish Guide
+# Publish Guide
 
 ## Prerequisites
 
@@ -10,33 +10,7 @@ npm login --scope=@prismwizard
 
 ---
 
-## Step 1: Merge PRs on GitHub (in order)
-
-Do this from your browser at `github.com/somekindawizard/homebridge-smartrent`.
-
-### PR #2 (architecture)
-
-1. Open PR #2
-2. Click **Merge pull request**
-3. Confirm
-
-### PR #3 (tests + schema)
-
-1. Open PR #3
-2. Click **Update branch**, wait for checks to go green
-3. Click **Merge pull request**
-4. Confirm
-
-### PR #4 (security + CI)
-
-1. Open PR #4
-2. Click **Update branch**, wait for checks to go green
-3. Click **Merge pull request**
-4. Confirm
-
----
-
-## Step 2: Pull to your Mac Mini
+## Step 1: Pull latest main
 
 ```sh
 cd ~/homebridge-smartrent
@@ -46,7 +20,7 @@ git pull origin main
 
 ---
 
-## Step 3: Clean install and verify
+## Step 2: Clean install and verify
 
 ```sh
 npm ci
@@ -55,11 +29,11 @@ npm run build
 npm test
 ```
 
-All three should pass. If anything fails, stop here.
+All should pass. If anything fails, stop here.
 
 ---
 
-## Step 4: Verify the tarball looks right
+## Step 3: Verify the tarball looks right
 
 ```sh
 npm pack --dry-run
@@ -67,24 +41,24 @@ npm pack --dry-run
 
 You should see only `dist/`, `config.example.json`, `config.schema.json`,
 `CHANGELOG.md`, `screenshot.png`, and `package.json`. No `src/` files.
-Total should be around 80-90 KB, down from ~165 KB.
 
 ---
 
-## Step 5: Bump the version
+## Step 4: Bump the version
 
-Pick one based on what feels right. `4.2.0` since we added features and
-refactored but nothing is breaking:
+Pick one based on what changed since the last publish:
 
-```sh
-npm version minor -m "chore(release): %s"
-```
+| Change type | Command | Example |
+|---|---|---|
+| Bug fixes only | `npm version patch -m "chore(release): %s"` | 4.2.0 → 4.2.1 |
+| New features, no breaking changes | `npm version minor -m "chore(release): %s"` | 4.2.0 → 4.3.0 |
+| Breaking config/API changes | `npm version major -m "chore(release): %s"` | 4.2.0 → 5.0.0 |
 
 This updates `package.json`, creates a git commit, and tags it.
 
 ---
 
-## Step 6: Push the version commit and tag
+## Step 5: Push the version commit and tag
 
 ```sh
 git push origin main --follow-tags
@@ -93,8 +67,8 @@ git push origin main --follow-tags
 > **Note:** If branch protection blocks the direct push, do this instead:
 >
 > ```sh
-> git checkout -b chore/release-4.2.0
-> git push origin chore/release-4.2.0
+> git checkout -b chore/release
+> git push origin chore/release
 > ```
 >
 > Then open a PR on GitHub, wait for green, merge, pull main, and push the tag:
@@ -102,31 +76,33 @@ git push origin main --follow-tags
 > ```sh
 > git checkout main
 > git pull origin main
-> git tag v4.2.0
-> git push origin v4.2.0
+> git push origin --tags
 > ```
 
 ---
 
-## Step 7: Publish to npm
+## Step 6: Publish to npm
 
 ```sh
 npm publish
 ```
 
+> `prepublishOnly` in `package.json` runs prettier, lint, build, and test
+> automatically before publishing. If any step fails, the publish is aborted.
+
 ---
 
-## Step 8: Verify it's live
+## Step 7: Verify it's live
 
 ```sh
 npm info @prismwizard/homebridge-smartrent version
 ```
 
-Should show `4.2.0`.
+Should match whatever you just bumped to.
 
 ---
 
-## Step 9: Update your Homebridge
+## Step 8: Update your Homebridge
 
 On whatever machine runs Homebridge:
 
@@ -134,14 +110,12 @@ On whatever machine runs Homebridge:
 sudo npm install -g @prismwizard/homebridge-smartrent@latest
 ```
 
-Then restart Homebridge. Your lock should show the correct firmware version
-(`4.2.0`) in the Home app under accessory details.
+Then restart Homebridge. The new version should show as the firmware version
+in the Home app under accessory details.
 
 ---
 
 ## Quick reference: full command sequence
-
-For when you just want to copy-paste (after merging PRs on GitHub):
 
 ```sh
 # Pull
@@ -156,7 +130,7 @@ npm run build
 npm test
 npm pack --dry-run
 
-# Version + publish
+# Version + publish (pick one: patch | minor | major)
 npm version minor -m "chore(release): %s"
 git push origin main --follow-tags
 npm publish
