@@ -13,6 +13,7 @@ export class LockAccessory extends BaseAccessory {
 
   private currentLockedState: CharacteristicValue;
   private targetLockedState: CharacteristicValue;
+  private currentFault: CharacteristicValue;
 
   constructor(platform: SmartRentPlatform, accessory: SmartRentAccessory) {
     super(platform, accessory, 'locks', { hasBattery: true });
@@ -20,6 +21,7 @@ export class LockAccessory extends BaseAccessory {
     const C = this.platform.api.hap.Characteristic;
     this.currentLockedState = C.LockCurrentState.UNSECURED;
     this.targetLockedState = C.LockTargetState.UNSECURED;
+    this.currentFault = C.StatusFault.NO_FAULT;
 
     this.service =
       this.accessory.getService(this.platform.api.hap.Service.LockMechanism) ||
@@ -35,6 +37,10 @@ export class LockAccessory extends BaseAccessory {
       .getCharacteristic(C.LockTargetState)
       .onGet(this.handleLockTargetStateGet.bind(this))
       .onSet(this.handleLockTargetStateSet.bind(this));
+
+    this.service
+      .getCharacteristic(C.StatusFault)
+      .onGet(this.handleStatusFaultGet.bind(this));
 
     this.startPolling();
   }
@@ -71,6 +77,20 @@ export class LockAccessory extends BaseAccessory {
       const locked = findBoolean(attrs, ATTR.LOCKED);
       const C = this.platform.api.hap.Characteristic;
       return locked ? C.LockTargetState.SECURED : C.LockTargetState.UNSECURED;
+    });
+  }
+
+  async handleStatusFaultGet(): Promise<CharacteristicValue> {
+    return this.hapCall('GET StatusFault', async () => {
+      const data = await this.platform.smartRentApi.getData<LockData>(
+        this.hubId,
+        this.deviceId
+      );
+      const C = this.platform.api.hap.Characteristic;
+      this.currentFault = data.online
+        ? C.StatusFault.NO_FAULT
+        : C.StatusFault.GENERAL_FAULT;
+      return this.currentFault;
     });
   }
 
@@ -167,16 +187,23 @@ export class LockAccessory extends BaseAccessory {
       this.currentLockedState = lockState;
       this.targetLockedState = targetState;
       this.scheduleAutoLock(targetState);
+    } else if (event.name !== ATTR.BATTERY_LEVEL) {
+      // Log unrecognized lock attributes for future discovery (e.g., jam state).
+      this.log.debug(
+        `[${this.accessory.displayName}] unhandled lock attr: ${event.name} = ${event.last_read_state}`
+      );
     }
     // battery_level events are handled by BaseAccessory
   }
 
   protected async pollState() {
-    const attrs = await this.platform.smartRentApi.getState<LockData>(
+    // Use getData (full payload) instead of getState (attributes only) so we
+    // can check the device's online status alongside the lock state.
+    const data = await this.platform.smartRentApi.getData<LockData>(
       this.hubId,
-      this.deviceId,
-      { skipCache: true }
+      this.deviceId
     );
+    const attrs = data.attributes;
     const locked = findBoolean(attrs, ATTR.LOCKED);
     const C = this.platform.api.hap.Characteristic;
     const newCurrent = this.toLockState(locked);
@@ -195,6 +222,33 @@ export class LockAccessory extends BaseAccessory {
       this.currentLockedState = newCurrent;
       this.targetLockedState = newTarget;
       this.scheduleAutoLock(newTarget);
+    }
+
+    // Surface device online/offline status as StatusFault so HomeKit users
+    // know when the lock is unreachable rather than silently trusting stale state.
+    const newFault = data.online
+      ? C.StatusFault.NO_FAULT
+      : C.StatusFault.GENERAL_FAULT;
+    if (
+      this.updateIfChanged(
+        this.service,
+        C.StatusFault,
+        newFault,
+        this.currentFault
+      )
+    ) {
+      this.log.warn(
+        `[${this.accessory.displayName}] lock ${data.online ? 'back online' : 'OFFLINE'}`
+      );
+      this.currentFault = newFault;
+    }
+
+    // Log warning field for observability; not yet mapped to a characteristic
+    // since we don't know what triggers it in SmartRent's API.
+    if (data.warning) {
+      this.log.debug(
+        `[${this.accessory.displayName}] device warning flag is set`
+      );
     }
   }
 
