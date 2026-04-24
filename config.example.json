@@ -9,10 +9,39 @@
   "platforms": [
     {
       "platform": "SmartRent",
+
+      "_comment_credentials": "--- Credentials ---",
       "email": "user@example.com",
       "password": "hunter2",
       "tfaSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456",
-      "unitName": "A1"
+      "unitName": "A1",
+
+      "_comment_devices": "--- Device toggles (all default to true) ---",
+      "enableLocks": true,
+      "enableThermostats": true,
+      "enableSwitches": true,
+      "enableSwitchMultiLevels": true,
+      "enableLeakSensors": true,
+      "enableContactSensors": true,
+      "enableMotionSensors": true,
+
+      "_comment_lock": "--- Lock behavior ---",
+      "enableAutoLock": false,
+      "autoLockDelayInMinutes": 5,
+
+      "_comment_sensors": "--- Sensor behavior ---",
+      "contactInverted": false,
+
+      "_comment_tuning": "--- Tuning ---",
+      "cacheTtlSeconds": 5,
+      "pollingIntervalSeconds": 30,
+      "pollingOverrides": {
+        "locks": 15,
+        "thermostats": 30,
+        "switches": 30,
+        "sensors": 60
+      },
+      "useCelsiusDisplay": false
     }
   ]
 }

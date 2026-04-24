@@ -1,0 +1,96 @@
+name: Bug Report
+description: Something isn't working as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill out the sections below so we can reproduce and fix it.
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: "Run: `npm list -g @prismwizard/homebridge-smartrent`"
+      placeholder: "5.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: homebridge-version
+    attributes:
+      label: Homebridge version
+      description: "Run: `homebridge --version`"
+      placeholder: "1.8.0"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: "Run: `node --version`"
+      placeholder: "v22.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system and hardware
+      placeholder: "Raspberry Pi 4 / Raspbian 12, macOS 15 ARM, Ubuntu 24.04 x64, etc."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device-type
+    attributes:
+      label: Affected device type
+      options:
+        - Lock
+        - Thermostat
+        - Dimmer switch
+        - Binary switch
+        - Leak sensor
+        - Contact sensor
+        - Motion sensor
+        - All devices / platform startup
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly. What did you expect vs. what actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we trigger this bug?
+      placeholder: |
+        1. Configure the plugin with ...
+        2. Open the Home app and ...
+        3. The lock shows ...
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Homebridge log output
+      description: |
+        Paste relevant log output here. Run Homebridge with `-D` for debug-level logs.
+        **Redact your email, password, and any tokens before pasting.**
+      render: text
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Plugin config (redacted)
+      description: |
+        Paste your SmartRent platform config from `config.json`.
+        **Replace email, password, and tfaSecret with placeholder values.**
+      render: json
