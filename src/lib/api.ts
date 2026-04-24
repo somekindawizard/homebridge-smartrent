@@ -105,8 +105,10 @@ export class SmartRentApi {
   }
 
   /**
-   * Fetch full device payload (includes battery, online, etc.). Not cached
-   * because callers need fields beyond `attributes`.
+   * Fetch full device payload (includes battery, online, warning, etc.).
+   *
+   * The attribute cache is populated as a side effect so that subsequent
+   * characteristic reads within the TTL window avoid a redundant HTTP call.
    */
   public async getData<Device extends BaseDeviceResponse>(
     hubId: string,
@@ -115,6 +117,7 @@ export class SmartRentApi {
     const device = await this.client.get<Device>(
       `/hubs/${hubId}/devices/${deviceId}`
     );
+    this.cache.set(hubId, deviceId, device.attributes);
     this.platform.log.debug('getData:', deviceId);
     return device;
   }
