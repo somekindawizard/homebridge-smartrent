@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <!-- Drop shadow filter -->
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1e1e2e" flood-opacity="0.10"/>
+    </filter>
+    <!-- Glow for arrows -->
+    <marker id="arrowDown" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrowUp" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrowDownGreen" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+    </marker>
+    <marker id="arrowDownAmber" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f59e0b"/>
+    </marker>
+    <!-- Gradient backgrounds -->
+    <linearGradient id="homeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f3ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#ede9fe;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="hbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#faf5ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#f3e8ff;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="pluginGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#faf5ff;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#dcfce7;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="restGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="wsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="520" rx="16" fill="#fafafa"/>
+  <rect x="0.5" y="0.5" width="719" height="519" rx="16" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="360" y="38" text-anchor="middle" font-size="15" font-weight="700" fill="#1e1b4b" letter-spacing="0.5">HOW IT WORKS</text>
+  <line x1="310" y1="48" x2="410" y2="48" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- APPLE HOME BOX -->
+  <!-- ════════════════════════════════════════════════ -->
+  <rect x="235" y="64" width="250" height="52" rx="12" fill="url(#homeGrad)" filter="url(#shadow)" stroke="#c4b5fd" stroke-width="1"/>
+  <!-- Apple Home icon (house) -->
+  <g transform="translate(275, 78)">
+    <path d="M12 2L2 10h3v10h6v-6h2v6h6V10h3L12 2z" fill="#7c3aed" opacity="0.8" transform="scale(0.9)"/>
+  </g>
+  <text x="360" y="95" text-anchor="middle" font-size="15" font-weight="600" fill="#4c1d95">Apple Home</text>
+
+  <!-- Arrow: Home -> Homebridge -->
+  <line x1="340" y1="116" x2="340" y2="148" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrowDown)" opacity="0.6"/>
+  <line x1="380" y1="148" x2="380" y2="116" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrowDown)" opacity="0.6" transform="rotate(180, 380, 132)"/>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- HOMEBRIDGE CONTAINER -->
+  <!-- ════════════════════════════════════════════════ -->
+  <rect x="100" y="150" width="520" height="165" rx="14" fill="url(#hbGrad)" filter="url(#shadow)" stroke="#c4b5fd" stroke-width="1"/>
+  <!-- Homebridge label -->
+  <text x="360" y="175" text-anchor="middle" font-size="14" font-weight="700" fill="#6d28d9">Homebridge</text>
+
+  <!-- Plugin box (nested) -->
+  <rect x="140" y="188" width="440" height="110" rx="10" fill="url(#pluginGrad)" stroke="#ddd6fe" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="360" y="210" text-anchor="middle" font-size="12" font-weight="600" fill="#7c3aed">homebridge-smartrent</text>
+
+  <!-- Cache chip -->
+  <rect x="175" y="224" width="120" height="56" rx="8" fill="#ffffff" stroke="#c4b5fd" stroke-width="1"/>
+  <g transform="translate(205, 238)">
+    <rect x="0" y="0" width="16" height="13" rx="2" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+    <line x1="0" y1="4.5" x2="16" y2="4.5" stroke="#7c3aed" stroke-width="1.2"/>
+    <line x1="0" y1="9" x2="16" y2="9" stroke="#7c3aed" stroke-width="1.2"/>
+    <circle cx="4" cy="2.2" r="1.2" fill="#7c3aed"/>
+    <circle cx="4" cy="6.8" r="1.2" fill="#7c3aed"/>
+    <circle cx="4" cy="11.2" r="1.2" fill="#7c3aed"/>
+  </g>
+  <text x="235" y="267" text-anchor="middle" font-size="12" font-weight="600" fill="#4c1d95">Cache</text>
+  <text x="235" y="278" text-anchor="middle" font-size="9" fill="#6b7280">Reduces burst reads</text>
+
+  <!-- Poller chip -->
+  <rect x="425" y="224" width="120" height="56" rx="8" fill="#ffffff" stroke="#c4b5fd" stroke-width="1"/>
+  <g transform="translate(457, 237)">
+    <circle cx="8" cy="8" r="7" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="8" y1="4" x2="8" y2="8" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="8" x2="11" y2="10" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <text x="485" y="267" text-anchor="middle" font-size="12" font-weight="600" fill="#4c1d95">Poller</text>
+  <text x="485" y="278" text-anchor="middle" font-size="9" fill="#6b7280">Fallback safety net</text>
+
+  <!-- State Manager center chip -->
+  <rect x="305" y="224" width="110" height="56" rx="8" fill="#ffffff" stroke="#c4b5fd" stroke-width="1"/>
+  <g transform="translate(336, 237)">
+    <path d="M8 0L16 4.5V13.5L8 18L0 13.5V4.5L8 0z" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+    <circle cx="8" cy="9" r="3" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  </g>
+  <text x="360" y="267" text-anchor="middle" font-size="12" font-weight="600" fill="#4c1d95">Platform</text>
+  <text x="360" y="278" text-anchor="middle" font-size="9" fill="#6b7280">Orchestrates all I/O</text>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- CONNECTION ARROWS -->
+  <!-- ════════════════════════════════════════════════ -->
+
+  <!-- REST arrow (left path) -->
+  <path d="M 280 315 L 280 370" stroke="#7c3aed" stroke-width="2.5" fill="none" marker-end="url(#arrowDown)" opacity="0.8"/>
+  <path d="M 265 370 L 265 315" stroke="#7c3aed" stroke-width="2.5" fill="none" marker-end="url(#arrowDown)" opacity="0.4" stroke-dasharray="6,4"/>
+
+  <!-- WebSocket arrow (right path) -->
+  <path d="M 455 370 L 455 315" stroke="#22c55e" stroke-width="2.5" fill="none" marker-end="url(#arrowDownGreen)" opacity="0.8" transform="rotate(180, 455, 342.5)"/>
+
+  <!-- REST label pill -->
+  <rect x="215" y="340" width="115" height="26" rx="13" fill="url(#restGrad)"/>
+  <text x="272" y="357" text-anchor="middle" font-size="10" font-weight="600" fill="#ffffff" letter-spacing="0.3">REST API</text>
+  <text x="272" y="378" text-anchor="middle" font-size="9" fill="#6b7280">Read / Write</text>
+
+  <!-- WebSocket label pill -->
+  <rect x="400" y="340" width="115" height="26" rx="13" fill="url(#wsGrad)"/>
+  <text x="457" y="357" text-anchor="middle" font-size="10" font-weight="600" fill="#ffffff" letter-spacing="0.3">WebSocket</text>
+  <text x="457" y="378" text-anchor="middle" font-size="9" fill="#6b7280">Real-time Events</text>
+
+  <!-- Bidirectional label on REST -->
+  <text x="252" y="331" text-anchor="middle" font-size="8" fill="#7c3aed" font-weight="500">↕ bidirectional</text>
+  <!-- Push label on WebSocket -->
+  <text x="470" y="331" text-anchor="middle" font-size="8" fill="#16a34a" font-weight="500">↑ push</text>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SMARTRENT CLOUD -->
+  <!-- ════════════════════════════════════════════════ -->
+  <rect x="175" y="395" width="370" height="52" rx="12" fill="url(#cloudGrad)" filter="url(#shadow)" stroke="#86efac" stroke-width="1"/>
+  <!-- Cloud icon -->
+  <g transform="translate(265, 408)">
+    <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="#22c55e" opacity="0.25"/>
+    <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="none" stroke="#16a34a" stroke-width="1.2"/>
+  </g>
+  <text x="360" y="428" text-anchor="middle" font-size="15" font-weight="600" fill="#166534">SmartRent Cloud</text>
+  <text x="360" y="442" text-anchor="middle" font-size="10" fill="#16a34a" opacity="0.8">Phoenix Channels</text>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- DEVICES ROW AT BOTTOM -->
+  <!-- ════════════════════════════════════════════════ -->
+  <text x="360" y="476" text-anchor="middle" font-size="9" fill="#9ca3af" letter-spacing="0.5" font-weight="500">CONNECTED DEVICES</text>
+
+  <text x="150" y="500" text-anchor="middle" font-size="18">🔒</text>
+  <text x="150" y="513" text-anchor="middle" font-size="8" fill="#6b7280">Lock</text>
+
+  <text x="234" y="500" text-anchor="middle" font-size="18">🌡️</text>
+  <text x="234" y="513" text-anchor="middle" font-size="8" fill="#6b7280">Thermostat</text>
+
+  <text x="318" y="500" text-anchor="middle" font-size="18">💡</text>
+  <text x="318" y="513" text-anchor="middle" font-size="8" fill="#6b7280">Dimmer</text>
+
+  <text x="402" y="500" text-anchor="middle" font-size="18">🔌</text>
+  <text x="402" y="513" text-anchor="middle" font-size="8" fill="#6b7280">Switch</text>
+
+  <text x="486" y="500" text-anchor="middle" font-size="18">💧</text>
+  <text x="486" y="513" text-anchor="middle" font-size="8" fill="#6b7280">Leak</text>
+
+  <text x="570" y="500" text-anchor="middle" font-size="18">🚪</text>
+  <text x="570" y="513" text-anchor="middle" font-size="8" fill="#6b7280">Contact</text>
+</svg>
