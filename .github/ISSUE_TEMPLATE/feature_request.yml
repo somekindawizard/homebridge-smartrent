@@ -1,0 +1,48 @@
+name: Feature Request
+description: Suggest a new feature or improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for the plugin? Describe it below.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - New device support
+        - New configuration option
+        - HomeKit integration improvement
+        - Developer experience / tooling
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What would you like?
+      description: Describe the feature or improvement you have in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Why is this useful?
+      description: What problem does this solve, or what workflow does it improve?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Have you tried any workarounds, or are there other approaches that could work?
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that would help (screenshots, links to SmartRent docs, similar plugins, etc.)
