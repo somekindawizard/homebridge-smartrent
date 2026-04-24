@@ -12,6 +12,7 @@ const LockCurrentState = { SECURED: 1, UNSECURED: 0 };
 const LockTargetState = { SECURED: 1, UNSECURED: 0 };
 const StatusLowBattery = { BATTERY_LEVEL_NORMAL: 0, BATTERY_LEVEL_LOW: 1 };
 const ChargingState = { NOT_CHARGEABLE: 2 };
+const StatusFault = { NO_FAULT: 0, GENERAL_FAULT: 1 };
 
 // Service type identifiers (just need to be stable object references)
 const ServiceType = {
@@ -123,6 +124,7 @@ function createLockTestHarness() {
           StatusLowBattery,
           LockCurrentState,
           LockTargetState,
+          StatusFault,
         },
         Service: ServiceType,
         HapStatusError: class extends Error {},
